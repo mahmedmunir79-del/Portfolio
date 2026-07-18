@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Ahmed — Chemical Engineer</title>
+<meta name="description" content="Muhammad Ahmed, Chemical Engineer in Lahore, Pakistan. Leading execution of a 150 TPD fractionation plant at NIMIR. Team Lead, Project Development & R&D. DICCE 2025 national champion.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F1E28;
+  --ink-2:#16303F;
+  --steam:#D9E5F0;
+  --paper:#FFFFFF;
+  --green:#177A56;
+  --green-dk:#0E5B3F;
+  --brass:#C9922E;
+  --steel:#67808C;
+  --line:#D9E2DE;
+  --disp:"Big Shoulders Display",sans-serif;
+  --body:"IBM Plex Sans",sans-serif;
+  --mono:"IBM Plex Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--ink);background-color:var(--steam);background-image:url("images/bgpattern.svg");background-size:300px 300px;line-height:1.6;font-size:16.5px}
+img{max-width:100%;display:block}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(15,30,40,.94);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.08)}
+.nav-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.2rem}
+.nav-name{font-family:var(--disp);font-weight:800;font-size:1.25rem;letter-spacing:.04em;color:#fff;text-transform:uppercase}
+.nav-name span{color:var(--brass)}
+.nav-links{display:flex;gap:1.4rem;flex-wrap:wrap}
+.nav-links a{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#B9C8CF}
+.nav-links a:hover{color:var(--brass);text-decoration:none}
+
+/* ---------- hero ---------- */
+.hero{background:var(--ink);color:#fff;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;opacity:.07;
+  background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);
+  background-size:56px 56px}
+.hero-in{max-width:1120px;margin:0 auto;padding:4.5rem 1.2rem 0;display:grid;grid-template-columns:1.25fr .75fr;gap:2rem;align-items:end;position:relative}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin-bottom:1.1rem}
+.eyebrow::before{content:"● ";color:var(--green)}
+h1{font-family:var(--disp);font-weight:800;font-size:clamp(3.2rem,9vw,6.4rem);line-height:.92;text-transform:uppercase;letter-spacing:.01em}
+h1 .thin{color:transparent;-webkit-text-stroke:2px #fff}
+.tagline{margin:1.4rem 0 1.8rem;max-width:34rem;font-size:1.12rem;color:#C9D6DB}
+.tagline em{color:var(--brass);font-style:italic}
+.hero-cta{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:2.6rem}
+.btn{font-family:var(--mono);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;padding:.8rem 1.4rem;border:1px solid var(--brass);color:var(--brass);transition:all .18s}
+.btn:hover{background:var(--brass);color:var(--ink);text-decoration:none}
+.btn.solid{background:var(--green);border-color:var(--green);color:#fff}
+.btn.solid:hover{background:var(--green-dk);border-color:var(--green-dk);color:#fff}
+.hero-photo{position:relative;align-self:end}
+.hero-photo img{width:min(320px,80%);margin:0 auto;filter:drop-shadow(0 18px 40px rgba(0,0,0,.5))}
+.hero-photo::after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(340px,86%);height:62%;border:1px solid rgba(201,146,46,.5);border-bottom:none;z-index:-1}
+
+/* KPI readout strip */
+.kpis{background:var(--ink-2);border-top:1px solid rgba(255,255,255,.1);position:relative}
+.kpis-in{max-width:1120px;margin:0 auto;padding:1.4rem 1.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.kpi{border-left:2px solid var(--brass);padding-left:1rem}
+.kpi b{font-family:var(--disp);font-weight:700;font-size:1.9rem;color:#fff;display:block;line-height:1.05}
+.kpi b small{font-family:var(--mono);font-size:.85rem;color:var(--brass)}
+.kpi span{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:#93A8B1}
+
+/* ---------- sections & data-plate headers ---------- */
+section{max-width:1120px;margin:0 auto;padding:4.5rem 1.2rem 1rem}
+.plate{display:inline-flex;align-items:stretch;border:1.5px solid var(--ink);margin-bottom:2.4rem;background:var(--paper)}
+.plate .tag{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;background:var(--ink);color:var(--brass);padding:.55rem .8rem;display:flex;align-items:center}
+.plate h2{font-family:var(--disp);font-weight:700;font-size:1.5rem;text-transform:uppercase;letter-spacing:.06em;padding:.35rem 1rem;display:flex;align-items:center}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:2.5rem;align-items:start}
+.lead{font-size:1.18rem;line-height:1.7}
+.lead strong{color:var(--green-dk)}
+.about-side{border:1px solid var(--line);background:var(--paper);padding:1.4rem}
+.about-side h3{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--steel);margin-bottom:.9rem}
+.spec{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px dashed var(--line);font-size:.92rem}
+.spec:last-child{border-bottom:none}
+.spec b{font-weight:600}
+.spec span{color:var(--steel);font-family:var(--mono);font-size:.8rem;text-align:right}
+
+/* ---------- career path flow ---------- */
+.flow{display:flex;align-items:stretch;gap:0;margin:0 0 2rem;flex-wrap:wrap}
+.step{flex:1;min-width:200px;background:var(--paper);border:1.5px solid var(--ink);padding:1rem 1.1rem;position:relative;display:flex;flex-direction:column;justify-content:center}
+.step + .step{margin-left:2.2rem}
+.step + .step::before{content:"";position:absolute;left:-2.2rem;top:50%;width:2.2rem;height:2px;background:var(--ink)}
+.step + .step::after{content:"";position:absolute;left:-.75rem;top:50%;transform:translateY(-50%);border:7px solid transparent;border-left-color:var(--ink)}
+.step .st-d{font-family:var(--mono);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);margin-bottom:.3rem}
+.step .st-t{font-family:var(--disp);font-weight:700;font-size:1.12rem;text-transform:uppercase;line-height:1.1}
+.step.now{background:var(--ink);color:#fff}
+.step.now .st-d{color:var(--brass)}
+.step.now::after{content:"NOW";position:absolute;top:-.7rem;right:.6rem;left:auto;transform:none;border:none;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;background:var(--brass);color:var(--ink);padding:.15rem .45rem}
+
+/* ---------- experience process line ---------- */
+.xp{position:relative;padding-left:2.2rem}
+.xp::before{content:"";position:absolute;left:.55rem;top:.4rem;bottom:.4rem;width:2px;background:var(--ink);opacity:.18}
+.job{position:relative;margin-bottom:3.2rem}
+.job::before{content:"";position:absolute;left:-2.08rem;top:.42rem;width:13px;height:13px;border-radius:50%;background:var(--steam);border:3px solid var(--green)}
+.job.current::before{background:var(--brass);border-color:var(--brass)}
+.job-head{display:flex;align-items:baseline;gap:.9rem;flex-wrap:wrap;margin-bottom:.2rem}
+.job-head h3{font-family:var(--disp);font-weight:700;font-size:1.7rem;text-transform:uppercase;letter-spacing:.03em}
+.dates{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;color:var(--steel)}
+.role{font-family:var(--mono);font-size:.8rem;color:var(--green-dk);letter-spacing:.06em;margin-bottom:1.1rem}
+.job-grid{display:grid;grid-template-columns:1fr 300px;gap:1.8rem;align-items:start}
+.job-grid.rev{grid-template-columns:300px 1fr}
+.sub{margin-bottom:1.3rem}
+.sub h4{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.4rem}
+.sub h4::before{content:"— ";color:var(--brass)}
+.sub ul{list-style:none;padding-left:1.1rem}
+.sub li{position:relative;margin-bottom:.4rem;font-size:.95rem}
+.sub li::before{content:"";position:absolute;left:-1.05rem;top:.62em;width:6px;height:6px;background:var(--green)}
+.figure{border:1px solid var(--line);background:var(--paper);padding:.5rem}
+.figure img{width:100%;object-fit:cover}
+.figure figcaption{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);padding:.55rem .2rem .15rem}
+.logo-chip{height:44px;width:auto;margin-bottom:.7rem}
+
+/* ---------- fractionation PFD block ---------- */
+.pfd{margin:0 0 3.2rem;margin-left:-2.2rem;background:#FBFDFF;border:1.5px solid var(--ink);padding:1.6rem 1.4rem 1.2rem;position:relative;overflow:hidden}
+.pfd::before{content:"";position:absolute;inset:0;opacity:.05;background-image:linear-gradient(var(--ink) 1px,transparent 1px),linear-gradient(90deg,var(--ink) 1px,transparent 1px);background-size:44px 44px}
+.pfd h4{position:relative;font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green-dk);margin-bottom:1rem}
+.pfd svg{position:relative;width:100%;height:auto;display:block}
+.pfd .cap{position:relative;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);margin-top:.8rem;text-align:right}
+@keyframes bub{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-92px);opacity:0}}
+@keyframes dashflow{to{stroke-dashoffset:-24}}
+.pfd .bubble{animation:bub 3.2s linear infinite}
+.pfd .b2{animation-delay:1.1s}
+.pfd .b3{animation-delay:2.1s}
+.pfd .flowline{stroke-dasharray:7 5;animation:dashflow 1.4s linear infinite}
+@media (prefers-reduced-motion: reduce){
+  .pfd .bubble,.pfd .flowline{animation:none}
+}
+
+/* ---------- projects ---------- */
+.proj{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.card{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--green);display:flex;flex-direction:column;transition:transform .18s, box-shadow .18s}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(15,30,40,.12)}
+.card img{aspect-ratio:16/10;object-fit:cover;width:100%}
+.card .pad{padding:1.2rem 1.2rem 1.4rem;display:flex;flex-direction:column;flex:1}
+.card .num{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;color:var(--brass);margin-bottom:.4rem}
+.card h3{font-family:var(--disp);font-weight:700;font-size:1.35rem;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.55rem}
+.card p{font-size:.93rem;flex:1}
+.card .foot{margin-top:1rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green-dk)}
+
+/* ---------- awards ---------- */
+.awards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.award{background:var(--ink);color:#fff;padding:.6rem}
+.award img{aspect-ratio:4/3.4;object-fit:cover;width:100%}
+.award .pad{padding:1rem .7rem .8rem}
+.award .place{font-family:var(--disp);font-weight:800;font-size:1.9rem;color:var(--brass);line-height:1}
+.award h3{font-size:1rem;font-weight:600;margin:.3rem 0 .15rem}
+.award span{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;color:#9FB3BC;text-transform:uppercase}
+
+/* ---------- education / contact ---------- */
+.edu{background:var(--paper);border:1px solid var(--line);padding:1.6rem 1.8rem;display:flex;justify-content:space-between;gap:1.4rem;flex-wrap:wrap;align-items:center}
+.edu h3{font-family:var(--disp);font-size:1.4rem;font-weight:700;text-transform:uppercase}
+.edu p{color:var(--steel);font-size:.95rem}
+.edu .cg{font-family:var(--mono);font-size:.85rem;color:var(--green-dk)}
+footer{background:var(--ink);color:#fff;margin-top:5rem;position:relative;overflow:hidden}
+footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:56px 56px}
+.foot-in{max-width:1120px;margin:0 auto;padding:4rem 1.2rem 2.5rem;position:relative}
+.foot-in h2{font-family:var(--disp);font-weight:800;font-size:clamp(2.4rem,6vw,4rem);text-transform:uppercase;line-height:1;margin-bottom:1.6rem}
+.foot-in h2 span{color:var(--brass)}
+.contact-row{display:flex;gap:2.4rem;flex-wrap:wrap;margin-bottom:3rem}
+.contact-row a,.contact-row div{font-family:var(--mono);font-size:.88rem;color:#C9D6DB}
+.contact-row a:hover{color:var(--brass);text-decoration:none}
+.contact-row b{display:block;font-family:var(--mono);font-weight:500;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);margin-bottom:.3rem}
+.fineprint{border-top:1px solid rgba(255,255,255,.12);padding-top:1.4rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:#7C919B;text-transform:uppercase;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.rv.on{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .card:hover{transform:none}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .hero-in{grid-template-columns:1fr;padding-top:3rem}
+  .hero-photo{order:-1}
+  .hero-photo img{width:min(240px,60%)}
+  .kpis-in{grid-template-columns:1fr;gap:.9rem}
+  .about-grid,.job-grid,.job-grid.rev{grid-template-columns:1fr}
+  .proj,.awards{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .flow{flex-direction:column}
+  .step + .step{margin-left:0;margin-top:2rem}
+  .step + .step::before{left:50%;top:-2rem;width:2px;height:2rem}
+  .step + .step::after{left:50%;top:-.8rem;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--ink);border-left-color:transparent}
+  .step.now::after{content:"NOW";top:-.7rem;right:.6rem;left:auto;transform:none;border:none}
+  .pfd{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="nav-name">M<span>.</span>AHMED</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#awards">Awards</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <p class="eyebrow">Chemical Engineer — Production Operations &amp; Manufacturing Excellence</p>
+      <h1>Muhammad<br><span class="thin">Ahmed</span></h1>
+      <p class="tagline"><em>“I like saving steam and money at the same time.”</em><br>
+      Team Lead, Project Development &amp; R&amp;D at NIMIR Industrial Chemicals — leading execution of a 150 TPD fractionation plant with international vendors and cross-functional teams.</p>
+      <div class="hero-cta">
+        <a class="btn solid" href="mailto:m.ahmedmunir79@gmail.com">Email me</a>
+        <a class="btn" href="#projects">View projects</a>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <img src="images/hero.png" alt="Muhammad Ahmed">
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpis-in">
+      <div class="kpi"><b>150 <small>TPD</small></b><span>Fractionation plant — leading erection &amp; execution</span></div>
+      <div class="kpi"><b>Shift <small>ENG</small></b><span>Plant-floor operations — oleochemical units</span></div>
+      <div class="kpi"><b>0.7 <small>t/h</small></b><span>Steam recovered — plant-wide steam audit</span></div>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="plate rv"><span class="tag">SEC-01</span><h2>About me</h2></div>
+  <div class="about-grid">
+    <p class="lead rv">Chemical Engineer at <strong>NIMIR Industrial Chemicals</strong> with plant-floor production experience across oil, oleochemical, soap and glycerin units — promoted through Manufacturing Excellence to <strong>Team Lead, Project Development &amp; R&amp;D within one year</strong>. Currently leading execution of a 150 TPD fractionation plant, managing international vendors and cross-functional teams. Background in food-grade FMCG manufacturing and HSE auditing to OSHA / OGRA / API standards at PSO. Inaugural winner of the LUMS national engineering design challenge.</p>
+    <div class="about-side rv">
+      <h3>Nameplate data</h3>
+      <div class="spec"><b>Role</b><span>Team Lead — Project<br>Development &amp; R&amp;D</span></div>
+      <div class="spec"><b>Degree</b><span>BS Chemical Engineering<br>COMSATS, Lahore</span></div>
+      <div class="spec"><b>Focus</b><span>Plant execution · Energy<br>recovery · Digitalization</span></div>
+      <div class="spec"><b>Vendors</b><span>Desmet · JJ-Lurgi<br>CMB · Technoilogy</span></div>
+      <div class="spec"><b>Base</b><span>Lahore, PK</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="plate rv"><span class="tag">SEC-02</span><h2>Experience</h2></div>
+  <div class="xp">
+
+    <article class="job current rv">
+      <div class="job-head"><h3>NIMIR Industrial Chemicals</h3><span class="dates">JUL 2025 — PRESENT</span></div>
+      <p class="role">Career path — promoted twice in one year:</p>
+
+      <div class="flow">
+        <div class="step"><div class="st-d">Jul — Oct 2025</div><div class="st-t">Trainee Engineer<br>Production Operations</div></div>
+        <div class="step"><div class="st-d">Oct 2025 — Jul 2026</div><div class="st-t">Manufacturing<br>Excellence Engineer</div></div>
+        <div class="step now"><div class="st-d">Jul 2026 — Present</div><div class="st-t">Team Lead — Project<br>Development &amp; R&amp;D</div></div>
+      </div>
+
+      <div class="job-grid">
+        <div>
+          <div class="sub">
+            <h4>★ Flagship — 150 TPD Fractionation &amp; Distillation Plant</h4>
+            <ul>
+              <li>Initiated during Manufacturing Excellence; now leading execution as second-in-command to the HOD.</li>
+              <li>Unified vendor scopes from Desmet Ballestra, CMB &amp; Technoilogy and Lurgi into one battery-limit definition; led OpEx cost-benefit analysis for licensor selection.</li>
+              <li>Sole company liaison for the process consultant (Lian Guan Engineering, Malaysia).</li>
+              <li>Leading civil, mechanical &amp; electrical workstreams — utilities and procurement on schedule.</li>
+            </ul>
+          </div>
+          <div class="sub">
+            <h4>Manufacturing Excellence</h4>
+            <ul>
+              <li>Recovered <b>0.7 t/h of steam</b>; plant-wide steam trap audit + new PRDS station.</li>
+              <li>Refined crude glycerine in-plant, cutting two process steps (~50-ton trial).</li>
+              <li>Built a real-time KPI dashboard for the CTO; digitized Soap Noodle, Oleo &amp; Soap Finishing plants (Lux, Dettol, Palmolive).</li>
+            </ul>
+          </div>
+          <div class="sub">
+            <h4>Trainee — Production Operations</h4>
+            <ul>
+              <li>Shift operations across oil, chemicals, soap &amp; glycerine units — SOPs, safety and product quality.</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <img class="logo-chip" src="images/nimir_logo.png" alt="NIMIR logo">
+          <figure class="figure"><img src="images/nimir_plant.jpg" alt="Muhammad Ahmed on site at the NIMIR plant"><figcaption>On site — NIMIR plant</figcaption></figure>
+        </div>
+      </div>
+    </article>
+
+    <div class="pfd rv">
+      <h4>PRJ-150 · Fractionation Column — Vendor Network</h4>
+      <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Process flow diagram: fractionation column connected to vendors Desmet, JJ-Lurgi, CMB and Technoilogy">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#C9922E"/>
+          </marker>
+          <!-- Malaysia flag (simplified) -->
+          <g id="flag-my">
+            <rect width="27" height="18" fill="#fff"/>
+            <g fill="#CC0001"><rect y="0" width="27" height="2.6"/><rect y="5.1" width="27" height="2.6"/><rect y="10.3" width="27" height="2.6"/><rect y="15.4" width="27" height="2.6"/></g>
+            <rect width="13.5" height="10.3" fill="#010066"/>
+            <circle cx="5.6" cy="5.1" r="3" fill="#FFCC00"/>
+            <circle cx="6.9" cy="5.1" r="2.55" fill="#010066"/>
+            <circle cx="10" cy="5.1" r="1.35" fill="#FFCC00"/>
+            <rect width="27" height="18" fill="none" stroke="#67808C" stroke-width=".6"/>
+          </g>
+          <!-- Italy flag -->
+          <g id="flag-it">
+            <rect width="9" height="18" fill="#009246"/>
+            <rect x="9" width="9" height="18" fill="#fff"/>
+            <rect x="18" width="9" height="18" fill="#CE2B37"/>
+            <rect width="27" height="18" fill="none" stroke="#67808C" stroke-width=".6"/>
+          </g>
+        </defs>
+        <!-- column -->
+        <g>
+          <rect x="415" y="55" width="70" height="230" rx="35" fill="#16303F" stroke="#C9922E" stroke-width="2"/>
+          <line x1="425" y1="105" x2="475" y2="105" stroke="#67808C" stroke-width="2"/>
+          <line x1="425" y1="145" x2="475" y2="145" stroke="#67808C" stroke-width="2"/>
+          <line x1="425" y1="185" x2="475" y2="185" stroke="#67808C" stroke-width="2"/>
+          <line x1="425" y1="225" x2="475" y2="225" stroke="#67808C" stroke-width="2"/>
+          <circle class="bubble"    cx="438" cy="260" r="4" fill="#177A56"/>
+          <circle class="bubble b2" cx="452" cy="265" r="3" fill="#C9922E"/>
+          <circle class="bubble b3" cx="464" cy="258" r="3.5" fill="#177A56"/>
+          <text x="450" y="310" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#67808C" letter-spacing="2">FRACTIONATION</text>
+          <line class="flowline" x1="450" y1="18" x2="450" y2="53" stroke="#177A56" stroke-width="2"/>
+        </g>
+        <!-- arrows -->
+        <line class="flowline" x1="413" y1="100" x2="268" y2="78"  stroke="#C9922E" stroke-width="2" marker-end="url(#arr)"/>
+        <line class="flowline" x1="413" y1="240" x2="268" y2="262" stroke="#C9922E" stroke-width="2" marker-end="url(#arr)"/>
+        <line class="flowline" x1="487" y1="100" x2="632" y2="78"  stroke="#C9922E" stroke-width="2" marker-end="url(#arr)"/>
+        <line class="flowline" x1="487" y1="240" x2="632" y2="262" stroke="#C9922E" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- Desmet — top left -->
+        <g>
+          <image href="images/logo_desmet.png" x="70" y="30" width="180" height="75" preserveAspectRatio="xMidYMid meet"/>
+          <use href="#flag-my" x="133" y="112"/>
+          <text x="167" y="126" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">MALAYSIA</text>
+        </g>
+        <!-- JJ-Lurgi — top right -->
+        <g>
+          <image href="images/logo_lurgi.png" x="655" y="35" width="180" height="66" preserveAspectRatio="xMidYMid meet"/>
+          <use href="#flag-my" x="718" y="112"/>
+          <text x="752" y="126" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">MALAYSIA</text>
+        </g>
+        <!-- CMB — bottom left (placeholder plate until logo upload) -->
+        <g>
+          <rect x="95" y="232" width="130" height="52" rx="4" fill="#fff" stroke="#1F4E8C" stroke-width="1.5"/>
+          <text x="160" y="266" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-weight="700" font-size="26" fill="#1F4E8C">CMB</text>
+          <use href="#flag-it" x="133" y="294"/>
+          <text x="167" y="308" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">ITALY</text>
+        </g>
+        <!-- Technoilogy — bottom right -->
+        <g>
+          <image href="images/logo_tech.png" x="700" y="220" width="90" height="68" preserveAspectRatio="xMidYMid meet"/>
+          <use href="#flag-it" x="718" y="294"/>
+          <text x="752" y="308" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">ITALY</text>
+        </g>
+      </svg>
+      <div class="cap">150 TPD fatty acid fractionation &amp; distillation — international vendor network</div>
+    </div>
+
+    <article class="job rv">
+      <div class="job-head"><h3>Pakistan State Oil</h3><span class="dates">JUL 2024 — AUG 2024</span></div>
+      <p class="role">Intern — HSE · R&amp;D</p>
+      <div class="job-grid rev">
+        <div>
+          <figure class="figure"><img src="images/pso_portrait.jpg" alt="Muhammad Ahmed at Pakistan State Oil"><figcaption>PSO House — Intern 2024</figcaption></figure>
+        </div>
+        <div>
+          <div class="sub">
+            <h4>HSE</h4>
+            <ul><li>Safety audits at retail outlets and storage depots (Machike, Lahore) per OSHA, OGRA &amp; API standards; recommended risk-mitigation improvements.</li></ul>
+          </div>
+          <div class="sub">
+            <h4>R&amp;D — Carbon &amp; Vapor Recovery</h4>
+            <ul><li>Award-winning project on carbon and vapor recovery; proposed automation for downstream outlets to improve efficiency and safety.</li></ul>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section id="projects">
+  <div class="plate rv"><span class="tag">SEC-03</span><h2>Projects</h2></div>
+  <div class="proj">
+    <div class="card rv">
+      <img src="images/pres2.jpg" alt="PSO carbon trading concept — emissions to revenue">
+      <div class="pad">
+        <div class="num">PRJ-01 · PSO</div>
+        <h3>Carbon Trading &amp; Recovery</h3>
+        <p>Presented a carbon-trading initiative to PSO employees — vapor recovery systems and carbon-credit markets generating revenue while cutting emissions.</p>
+        <div class="foot">Awarded · Presented at national forums</div>
+      </div>
+    </div>
+    <div class="card rv">
+      <img src="images/dicce_art.jpg" alt="DICCE 2025 — Design and Innovation Challenge for Chemical Engineers">
+      <div class="pad">
+        <div class="num">PRJ-02 · DICCE, LUMS</div>
+        <h3>n-Butanal Plant Design</h3>
+        <p>Complete 100,000 TPY industrial process design with five-layer LOPA safety analysis, against 7 top universities. <b>First place nationally.</b></p>
+        <div class="foot">1st place · PKR 100,000 prize</div>
+      </div>
+    </div>
+    <div class="card rv">
+      <img src="images/brick_mold.jpg" alt="WRICKS eco-plastic brick">
+      <div class="pad">
+        <div class="num">PRJ-03 · COMSATS</div>
+        <h3>Eco-Plastic Bricks</h3>
+        <p>Recycled PP / PET and sand as a durable, cost-effective substitute for conventional fired bricks — cutting plastic pollution and landfill.</p>
+        <div class="foot">2nd place · CPD Project</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="awards">
+  <div class="plate rv"><span class="tag">SEC-04</span><h2>Awards</h2></div>
+  <div class="awards">
+    <div class="award rv">
+      <img src="images/award_dicce.jpg" alt="Winning team at DICCE, LUMS">
+      <div class="pad"><div class="place">1st</div><h3>DICCE 2025 — LUMS</h3><span>National design challenge · PKR 100,000</span></div>
+    </div>
+    <div class="award rv">
+      <img src="images/award_cpdp.jpg" alt="CPDP award at COMSATS">
+      <div class="pad"><div class="place">2nd</div><h3>CPDP — COMSATS</h3><span>Plastic bricks project</span></div>
+    </div>
+    <div class="award rv">
+      <img src="images/award_uet.jpg" alt="Intern Fest award at UET Lahore">
+      <div class="pad"><div class="place">3rd</div><h3>Intern-Fest — UET Lahore</h3><span>Carbon trading / recovery project</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="plate rv"><span class="tag">SEC-05</span><h2>Education</h2></div>
+  <div class="edu rv">
+    <div>
+      <h3>BS Chemical Engineering</h3>
+      <p>COMSATS University, Lahore · 2021 — 2025</p>
+    </div>
+    <div class="cg">Electives: Petrochemical Engineering · CPDS</div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="foot-in">
+    <h2>Let’s save some<br>steam <span>together.</span></h2>
+    <div class="contact-row">
+      <a href="mailto:m.ahmedmunir79@gmail.com"><b>Email</b>m.ahmedmunir79@gmail.com</a>
+      <a href="tel:+923328437919"><b>Phone</b>+92 332 8437919</a>
+      <div><b>Location</b>Lahore, Pakistan</div>
+    </div>
+    <div class="fineprint">
+      <span>Muhammad Ahmed · Chemical Engineer</span>
+      <span>NIMIR · PSO · DICCE 2025 Champion</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('on'); obs.unobserve(e.target); } }), {threshold:.12});
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
