@@ -22,48 +22,58 @@
 6. **Performance:** the site must stay fast. Animate only transform and opacity where possible, and load libraries from a CDN or npm with no bloat.
 7. **Mobile:** everything must work and look good at phone width. Scroll animations must not stutter on mobile.
 8. **Safe deploys:** work on a separate branch and give me a Netlify deploy preview link. Never deploy to the live site without my explicit "yes."
-9. **Keep the existing fractionation-column animation as it is for now.** We will rebuild it in a later step.
+9. **Vendor content is fixed:** the four vendors (Desmet and JJ-Lurgi, Malaysia; CMB and Technoilogy, Italy), their logos in `images/` and their flags must stay exactly as they are. Don't add product names or labels to the column that I haven't given you.
 
 ---
 
-## CURRENT TASK: Step 1 — UI/UX overhaul + two new sections
+## DONE: Step 1 (branch `redesign-step1`)
+Card layout, emerald/amber palette, scroll line and grow effects. Approved apart from the two fixes in Step 2. Not live yet.
 
-### Part A: Study first (no code yet)
-1. Open my live site in Chrome. Note its current layout, structure, colours, fonts and any existing animations.
-2. Open the reference site: **https://lusion.co/**
-   - Note: Lusion builds much of its motion with WebGL/3D rendering. **Do not use WebGL or Three.js.** Recreate the *feel* of its scroll effects with lightweight SVG + CSS + GSAP ScrollTrigger so the site stays fast. If an effect truly can't be done without WebGL, tell me rather than adding it.
-   - Study **only its scroll animations**, specifically:
-     - **Contract/expand on scroll:** how elements and sections shrink, grow or reveal as the page scrolls.
-     - **Flowing line:** a line that flows and wiggles along the page as you scroll, drawing itself in step with scroll progress.
-   - **Ignore its videos and video-based animations completely. Do not copy them.**
-   - Don't copy its branding, content, or exact design. Learn the motion techniques only.
-3. Report back in 5–10 short bullet points: what the two scroll effects are doing technically and how you plan to recreate them. Then continue to Part B unless something is unclear.
+## CURRENT TASK: Step 2 — two scroll fixes + fractionation animation rebuild
+Keep working on the `redesign-step1` branch. Change only what's listed below. Everything else from Step 1 stays as it is.
 
-### Part B: Build
-1. **Proper sections (the main problem):** right now my Nimir work, internship and other projects all run together in one long line with no separation. Restructure this into clear, separate sections and blocks:
-   - Each job, internship or project gets its own **card/block** with a light-coloured background.
-   - **On hover:** the card changes colour subtly and/or lifts slightly with a soft shadow.
-   - Clear headings, spacing and visual hierarchy between sections.
-2. **Scroll animations** (inspired by the reference):
-   - The flowing/wiggling line running down the page and drawing as you scroll. It should connect the sections visually, like a journey or timeline.
-   - Sections contracting/expanding gently as they enter the view.
-   - Keep these to the two effects above. Don't add more animation types.
-3. **Two new sections** (place them where they fit best in the Projects area and tell me where you put them):
-   - **Continuous Improvement Idea Portal (Power Apps)**
-     - Short description (draft below; use it as written unless I change it).
-     - An **empty image placeholder** box, properly styled and sized, labelled "Image coming soon." I'll add the image later.
-   - **Project Tracker Automation (Power Automate)**
-     - Short description (draft below).
-     - An **empty animation placeholder** box, styled and sized, labelled "Animation coming soon." We'll build the animation in a later step.
+### Fix 1: the scroll line is too fast
+- Problem: the flowing line races down the page ahead of me, reaching the bottom of the screen before I've scrolled there.
+- Fix: the line must draw **in step with my reading position**. Its tip should stay level with about the middle of the screen as I scroll, never ahead of the content I'm looking at.
+- Tie it directly to scroll (GSAP ScrollTrigger `scrub`, with light smoothing so it glides rather than jumps). Check the start/end points against the full page height so the line finishes exactly at the end of the last section, not early.
+- Test it on desktop and phone width by scrolling slowly and quickly. The tip must never run ahead.
 
-**Draft description: CI Idea Portal**
-> Built a Continuous Improvement Idea Portal using Microsoft Power Apps, giving everyone at the company one place to submit improvement ideas. Upper management reviews each idea and approves or declines it, and the originator is credited by name to encourage participation. Available in Microsoft Teams and as a web app in the browser.
+### Fix 2: add the contract/expand effect (like lusion.co)
+- What's missing: on lusion.co, content you've scrolled past **shrinks slightly** as it leaves the top of the screen, and content coming up from below **grows** into place. We currently only have part of this.
+- Build both directions, tied to scroll (`scrub`):
+  - **Entering from below:** a section/card starts slightly smaller (about 92–94% size) and slightly faded, and grows to full size as it reaches the middle of the screen.
+  - **Leaving at the top:** as it scrolls up past the top, it shrinks back slightly (to about 94%) and fades a little.
+- Subtle, not dramatic. Use transform and opacity only, with no layout shifts and no overlapping text.
+- On phones, use a smaller amount (about 97%) so it stays smooth. With `prefers-reduced-motion`, turn it off.
+- Check that the existing card hover effects still work alongside it.
 
-**Draft description: Project Tracker Automation**
-> Automated project deadline tracking with Microsoft Power Automate. Instead of manually checking the MS Project schedule every morning, the system emails the responsible person and me automatically when a deadline is approaching or has passed, and keeps an Excel log of every reminder sent.
+### Rebuild: the fractionation "vendor network" animation
+Replace the current animation in the `.pfd` block ("PRJ-150 · Fractionation Column — Vendor Network") with a short, video-like sequence built entirely in code (SVG + GSAP timeline). **No video files.** Use Context7 to check the current GSAP timeline and ScrollTrigger docs before writing it.
 
-### When Step 1 is done
-- Give me the deploy preview link.
-- Show before/after screenshots (desktop and mobile).
-- List what you changed and anything you weren't sure about.
-- Wait for my review. Don't start the next step on your own.
+**Sequence (about 8–10 seconds in total):**
+1. **Logos intro (~3 s):** the four vendor logos pop in one after another (scale up from small, with a slight overshoot), each with its flag and country label. Hold briefly, then all four fade away together.
+2. **Column builds (~3 s):** the fractionation column appears in the centre. The outline draws itself, then the internals fade in:
+   - **Packed beds** (two or three sections of structured packing, drawn as a fine crosshatch or angled pattern) with liquid distributors above each bed.
+   - **Reboiler** at the bottom and **condenser** at the top.
+   - A **temperature gradient** inside the shell, warm orange at the bottom fading to cool blue at the top.
+3. **Process running (continuous):**
+   - **Vapour** rising up through the packing as small soft dots or wisps.
+   - **Liquid** trickling down through the packing as thin streaks.
+   - **Bubbling** in the bottom sump/reboiler, where the liquid is boiling.
+   - Keep it calm and slow, not busy.
+4. **Vendor network returns (~2 s):** the four arrows draw out from the column, one to each vendor, in the same positions as the current diagram. Each logo, flag and country label reappears at the end of its arrow as the arrow arrives.
+
+**Behaviour:**
+- The sequence starts when the block scrolls into view and plays **once**. After that it rests on the final diagram, with only the gentle internal flow (vapour, liquid, bubbles) continuing.
+- Add a small, discreet **"Replay"** button in the corner of the block to play the full sequence again.
+- Pause all motion when the block is off-screen, to save battery.
+- With `prefers-reduced-motion`, skip the sequence and show the final diagram with no motion.
+- Keep the block's existing heading and caption text exactly as they are.
+- Use the site's palette (emerald and amber) for the column and arrows so it matches the rest of the site.
+- It must look good and stay readable at phone width. The logos can stack or scale down on small screens.
+
+### When Step 2 is done
+- Push to `redesign-step1` and give me the updated deploy preview link.
+- Give me a short screen recording or GIF of the fractionation sequence, plus before/after notes for the two fixes.
+- List anything you weren't sure about.
+- Wait for my review. Don't put anything on the live site.
