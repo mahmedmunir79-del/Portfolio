@@ -738,6 +738,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
   }
 
   gsap.set(settle, {scale: 1.04, transformOrigin: '50% 0%'});
+  gsap.set(lines, {y: 0, yPercent: 110}); // take over the CSS start offset so the two don't add up
   tl = gsap.timeline({onComplete: finish});
   // 1) loader: bar + counter fill while the engineering lines roll up one after another
   const FILL = 1.5, step = FILL / lines.length, c = {v: 0};
