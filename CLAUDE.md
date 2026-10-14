@@ -48,29 +48,56 @@ Keep working on the `redesign-step1` branch. Change only what's listed below. Ev
 - Check that the existing card hover effects still work alongside it.
 
 ### Rebuild: the fractionation "vendor network" animation
-Replace the current animation in the `.pfd` block ("PRJ-150 · Fractionation Column — Vendor Network") with a short, video-like sequence built entirely in code (SVG + GSAP timeline). **No video files.** Use Context7 to check the current GSAP timeline and ScrollTrigger docs before writing it.
+Replace the current animation in the `.pfd` block ("PRJ-150 · Fractionation Column — Vendor Network") with a short, video-like sequence built entirely in code: inline SVG + one GSAP timeline + ScrollTrigger. **No video files, no WebGL, no Lottie.** Use Context7 to check the current GSAP timeline, ease and ScrollTrigger docs before writing it.
 
-**Sequence (about 8–10 seconds in total):**
-1. **Logos intro (~3 s):** the four vendor logos pop in one after another (scale up from small, with a slight overshoot), each with its flag and country label. Hold briefly, then all four fade away together.
-2. **Column builds (~3 s):** the fractionation column appears in the centre. The outline draws itself, then the internals fade in:
-   - **Packed beds** (two or three sections of structured packing, drawn as a fine crosshatch or angled pattern) with liquid distributors above each bed.
-   - **Reboiler** at the bottom and **condenser** at the top.
-   - A **temperature gradient** inside the shell, warm orange at the bottom fading to cool blue at the top.
-3. **Process running (continuous):**
-   - **Vapour** rising up through the packing as small soft dots or wisps.
-   - **Liquid** trickling down through the packing as thin streaks.
-   - **Bubbling** in the bottom sump/reboiler, where the liquid is boiling.
-   - Keep it calm and slow, not busy.
-4. **Vendor network returns (~2 s):** the four arrows draw out from the column, one to each vendor, in the same positions as the current diagram. Each logo, flag and country label reappears at the end of its arrow as the arrow arrives.
+**The story it tells:** *four international vendors come together to build one plant.* I lead the erection and execution of this plant, so the animation should feel like the project itself: vendors converge, the column is erected section by section, the plant is commissioned and comes to life, and the vendor network is shown around it. Every scene has a reason; nothing moves just for decoration.
 
-**Behaviour:**
-- The sequence starts when the block scrolls into view and plays **once**. After that it rests on the final diagram, with only the gentle internal flow (vapour, liquid, bubbles) continuing.
-- Add a small, discreet **"Replay"** button in the corner of the block to play the full sequence again.
-- Pause all motion when the block is off-screen, to save battery.
-- With `prefers-reduced-motion`, skip the sequence and show the final diagram with no motion.
-- Keep the block's existing heading and caption text exactly as they are.
-- Use the site's palette (emerald and amber) for the column and arrows so it matches the rest of the site.
-- It must look good and stay readable at phone width. The logos can stack or scale down on small screens.
+**Scene 1: The vendors (~2.5 s)**
+- The block's blueprint grid background fades in first, as a faint engineering-drawing feel.
+- The four vendor logos pop in at their corner positions one after another (about 0.25 s apart): scale from 0.6 to 1 with a gentle overshoot (`back.out`), with the flag and country label sliding up just after each logo.
+- Hold for about 1 second so each logo can be recognised.
+
+**Scene 2: Convergence (~1.5 s)**
+- Instead of a plain fade-out, each logo **shrinks and glides toward the centre** of the block (`power2.inOut`), dissolving into a small amber point of light as it travels.
+- The four points meet at the column's base position and flash softly once. That flash is where the column will rise from.
+
+**Scene 3: Erection (~3 s)**
+Build the column the way a real one goes up on site, bottom to top:
+- The bottom head and skirt draw first (SVG stroke drawing).
+- Then each shell section **lowers into place from slightly above**, like a crane lift, with a tiny settle at the end (`power3.out`). Stack in order: bottom section with sump, packed bed 1, liquid distributor, packed bed 2, liquid distributor, packed bed 3, top head.
+- **Packing:** draw each bed as structured packing, a fine diagonal crosshatch inside the shell. Distributors are thin horizontal bars with small drip points.
+- Last, the **reboiler** (bottom, beside the sump) and the **condenser** (top) draw in with their connecting pipes. Pipes draw along their length as if being run.
+
+**Scene 4: Commissioning (~3 s)**
+Start the column up in the same order a real start-up follows:
+1. **Heat on:** the reboiler glows warm, and bubbles start in the sump.
+2. **Column heats up:** a warm-to-cool temperature gradient (amber at the bottom fading to a cool emerald/teal at the top, matching the site palette) **fills upward** inside the shell, like the temperature profile establishing.
+3. **Vapour rises:** small soft dots travel up through the packing (slightly zig-zag, as if finding a path through it).
+4. **Overhead and reflux:** when the first vapour reaches the top, the condenser activates (a subtle cool pulse), and then **liquid starts trickling down** through the packing as thin streaks, slower than the vapour.
+This order (heat, vapour up, then reflux down) must be kept. It's what makes it read as a real column to an engineer.
+
+**Scene 5: The network (~2 s)**
+- The four arrows draw out from the column to the four corner positions (same layout as the current diagram), staggered about 0.2 s apart.
+- As each arrow arrives, its logo, flag and country label pop back in at the arrow's end.
+- A single soft pulse travels along each arrow once, then the arrows settle into the slow dashed "flow" style the current diagram uses.
+
+**Resting state (after the sequence)**
+- Only the gentle internal process keeps moving: bubbles in the sump, vapour rising, liquid trickling, and the slow dashed flow on the arrows. All of it is calm and slow. A visitor should be able to read the logos without being distracted.
+- Particle limits so it stays light: about 12 vapour dots, 8 liquid streaks and 6 bubbles at once, recycled in loops.
+
+**One interaction**
+- Hovering over (or tapping, on a phone) a vendor logo highlights its arrow in amber and gently dims the other three. Moving away restores them. Nothing else is interactive.
+
+**Behaviour**
+- The sequence starts when the block is about 40% into view and plays **once**. After that it rests in the final state.
+- A small, discreet **"Replay"** button (an icon with that word) sits in the bottom-left corner of the block and restarts the full sequence.
+- Pause all motion when the block is off-screen.
+- With `prefers-reduced-motion`: skip the sequence and show the final diagram with no motion.
+- Keep the block's existing heading and caption text exactly as they are. **Don't add any new words or labels** inside the animation.
+- Colours: use the site palette, emerald and amber, with the existing dark navy column body if it still fits.
+- **Phone width:** scale the scene so logos stay readable. If they get too small, place two vendors above the column and two below instead of in the corners, and shorten the arrows to match.
+- Animate only transform, opacity and SVG stroke drawing. Use GSAP core + ScrollTrigger only, with no other plugins unless they're free and genuinely needed.
+- Timing guide: the full sequence is about 12 seconds. If it feels long when you watch it, tighten the holds rather than speeding up the motion.
 
 ### When Step 2 is done
 - Push to `redesign-step1` and give me the updated deploy preview link.
