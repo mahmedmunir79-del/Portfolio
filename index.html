@@ -597,10 +597,19 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
     path.setAttribute('d', d);
     len = path.getTotalLength();
     path.style.strokeDasharray = len + ' ' + len;
+    // sample length -> height, so the line's tip follows the scroll position down the page
+    samples = [];
+    for (let i = 0; i <= 600; i++) { const l = len * i / 600; samples.push([l, path.getPointAtLength(l).y]); }
+    height = H;
     drawLine();
   }
-  let len = 0, drawn = 1; // drawn: 0..1 share of the line that is visible
-  function drawLine(){ path.style.strokeDashoffset = len * (1 - drawn); }
+  let len = 0, height = 1, samples = [[0, 0]], drawn = 1; // drawn: 0..1 of page height reached
+  function drawLine(){
+    const y = drawn * height;
+    let lo = 0, hi = samples.length - 1;
+    while (lo < hi) { const m = (lo + hi) >> 1; if (samples[m][1] < y) lo = m + 1; else hi = m; }
+    path.style.strokeDashoffset = drawn >= 1 ? 0 : len - samples[lo][0];
+  }
 
   if (!window.gsap || !window.ScrollTrigger) { buildPath(); return; } // no CDN: static, fully drawn line
   gsap.registerPlugin(ScrollTrigger);
