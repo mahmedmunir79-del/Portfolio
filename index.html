@@ -30,7 +30,6 @@
   --mono:"IBM Plex Mono",monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{font-family:var(--body);color:var(--ink);background-color:var(--steam);line-height:1.6;font-size:16.5px}
 img{max-width:100%;display:block}
 a{color:var(--green);text-decoration:none}
@@ -223,7 +222,6 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
 .fineprint{border-top:1px solid rgba(255,255,255,.12);padding-top:1.4rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:#7C919B;text-transform:uppercase;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 
 @media (prefers-reduced-motion: reduce){
-  html{scroll-behavior:auto}
   .card,.blk{transition:background-color .25s ease}
   .card:hover,.blk:hover{translate:none}
 }
@@ -647,6 +645,18 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script>
+// Smooth scrolling for in-page links only. (CSS scroll-behavior:smooth on <html> would also
+// smooth ScrollTrigger's own measuring scrolls and throw off every scroll animation.)
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  const target = a && a.getAttribute('href').length > 1 && document.querySelector(a.getAttribute('href'));
+  if (!target) return;
+  e.preventDefault();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  target.scrollIntoView({behavior: reduce ? 'auto' : 'smooth'});
+  history.pushState(null, '', a.getAttribute('href'));
+});
+
 (function(){
   const main = document.querySelector('main');
   const path = document.getElementById('flowPath');
