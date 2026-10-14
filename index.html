@@ -717,7 +717,8 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
     //    the last stretch eases ahead just enough to finish exactly at the end of the last section.
     const mainTop = () => main.getBoundingClientRect().top + window.scrollY;
     const pos = {s: 0};
-    const lineTween = gsap.fromTo(pos, {s: 0}, {
+    let lineTween = null;
+    lineTween = gsap.fromTo(pos, {s: 0}, {
       s: 1, ease: 'none',
       scrollTrigger: {
         trigger: main, start: 'top 50%',
@@ -725,7 +726,9 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
         scrub: .4
       },
       onUpdate: () => {
-        const st = lineTween.scrollTrigger, span = st.end - st.start;
+        const st = lineTween && lineTween.scrollTrigger;
+        if (!st) return;
+        const span = st.end - st.start;
         const s = pos.s * span;                  // smoothed scroll distance past the start
         const short = height - span;             // > 0 only when the page runs out of scroll
         let extra = 0;
@@ -736,6 +739,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
         tipY = s + extra; drawLine();
       }
     });
+    tipY = 0; drawLine(); // start undrawn; ScrollTrigger sets the real position on its first update
 
     // 2) Contract / expand (both directions): blocks grow in from below until they reach the
     //    middle of the screen, then shrink back slightly as they leave the top.
