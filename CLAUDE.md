@@ -13,6 +13,9 @@
 - **frontend-design skill:** use it if it's available.
 - **Netlify connector:** deploy previews only (see the rules below).
 
+## How to report back (important)
+- Keep chat messages short. Only send what I need: questions you must ask, the preview link, and a brief list of what changed. No step-by-step narration, no long explanations, no repeating these instructions back to me.
+
 ## Rules (apply to every step)
 1. **Content fidelity:** keep all my existing text, project details, dates and names exactly as they are. Don't rewrite, shorten, or invent content. If something looks wrong, ask me; don't fix it silently.
 2. **No video:** no video files, background videos, or heavy media. All motion is code (CSS, SVG, GSAP or Motion).
@@ -26,81 +29,53 @@
 
 ---
 
-## DONE: Step 1 (branch `redesign-step1`)
-Card layout, emerald/amber palette, scroll line and grow effects. Approved apart from the two fixes in Step 2. Not live yet.
+## DONE
+- **Step 1** (branch `redesign-step1`): card layout, emerald/amber palette, scroll line and grow effects.
+- **Step 2**: scroll fixes and the fractionation storyboard animation. Approved apart from the tweaks below. Not live yet.
 
-## CURRENT TASK: Step 2 — two scroll fixes + fractionation animation rebuild
-Keep working on the `redesign-step1` branch. Change only what's listed below. Everything else from Step 1 stays as it is.
+## CURRENT TASK: Step 2b — four tweaks
+Keep working on `redesign-step1`. Change only what's listed here; everything else stays as it is.
 
-### Fix 1: the scroll line is too fast
-- Problem: the flowing line races down the page ahead of me, reaching the bottom of the screen before I've scrolled there.
-- Fix: the line must draw **in step with my reading position**. Its tip should stay level with about the middle of the screen as I scroll, never ahead of the content I'm looking at.
-- Tie it directly to scroll (GSAP ScrollTrigger `scrub`, with light smoothing so it glides rather than jumps). Check the start/end points against the full page height so the line finishes exactly at the end of the last section, not early.
-- Test it on desktop and phone width by scrolling slowly and quickly. The tip must never run ahead.
+### Tweak 1: intro loading screen (like lusion.co)
+Re-open https://lusion.co/ in Chrome and study **only its opening**: the short loading screen and the way it hands over to the site. Recreate that feel in lightweight code (no WebGL, no video).
 
-### Fix 2: add the contract/expand effect (like lusion.co)
-- What's missing: on lusion.co, content you've scrolled past **shrinks slightly** as it leaves the top of the screen, and content coming up from below **grows** into place. We currently only have part of this.
-- Build both directions, tied to scroll (`scrub`):
-  - **Entering from below:** a section/card starts slightly smaller (about 92–94% size) and slightly faded, and grows to full size as it reaches the middle of the screen.
-  - **Leaving at the top:** as it scrolls up past the top, it shrinks back slightly (to about 94%) and fades a little.
-- Subtle, not dramatic. Use transform and opacity only, with no layout shifts and no overlapping text.
-- On phones, use a smaller amount (about 97%) so it stays smooth. With `prefers-reduced-motion`, turn it off.
-- Check that the existing card hover effects still work alongside it.
+**Sequence (2.5–3 s total, never longer):**
+1. **Loader (~1.5 s):** full-screen panel in the site's dark navy with a thin emerald progress bar or counter (0 → 100). While it fills, short goofy engineering lines **roll up one after another** (each slides up into view and out, like an odometer or ticker):
+   - "Heating up the reboiler…"
+   - "Establishing reflux…"
+   - "Checking the mass balance…"
+   - "Venting the last bit of steam…"
+2. **Final line (~0.6 s):** the ticker stops on **"Let's blow off some steam together."** in larger text, held briefly.
+3. **Zoom reveal (~0.6 s):** that line **zooms toward the viewer** (scales up and fades) while the panel opens (splits or wipes away), and the portfolio appears behind it with a slight settle from 1.04 to 1.0 scale. The hero then plays its normal entrance.
 
-### Rebuild: the fractionation "vendor network" animation
-Replace the current animation in the `.pfd` block ("PRJ-150 · Fractionation Column — Vendor Network") with a short, video-like sequence built entirely in code: inline SVG + one GSAP timeline + ScrollTrigger. **No video files, no WebGL, no Lottie.** Use Context7 to check the current GSAP timeline, ease and ScrollTrigger docs before writing it.
+**Rules for the loader:**
+- Show it **once per visit** (use `sessionStorage`). Reloads within the same visit go straight to the site.
+- Any click, tap, scroll or key press **skips** it immediately.
+- Never block the page longer than 3 s, even on slow connections. If assets are still loading, reveal anyway.
+- With `prefers-reduced-motion`: just a quick fade, no rolling or zoom.
+- Use the site's existing fonts and palette. The lines above are the only new text; use them exactly.
 
-**The story it tells:** *four international vendors come together to build one plant.* I lead the erection and execution of this plant, so the animation should feel like the project itself: vendors converge, the column is erected section by section, the plant is commissioned and comes to life, and the vendor network is shown around it. Every scene has a reason; nothing moves just for decoration.
+### Tweak 2: thicker scroll line
+- The flowing scroll line is too thin. Compare it with the line on lusion.co and make it clearly bolder: about **3–4 px on desktop and 2.5–3 px on phones**, with rounded ends.
+- Scale the tip marker dot to match. Keep the current colour, speed and path.
 
-**Scene 1: The vendors (~2.5 s)**
-- The block's blueprint grid background fades in first, as a faint engineering-drawing feel.
-- The four vendor logos pop in at their corner positions one after another (about 0.25 s apart): scale from 0.6 to 1 with a gentle overshoot (`back.out`), with the flag and country label sliding up just after each logo.
-- Hold for about 1 second so each logo can be recognised.
+### Tweak 3: fractionation animation loops continuously
+- **Remove the Replay button** completely.
+- The full storyboard sequence (vendors → convergence → erection → commissioning → network) now **loops forever** while the block is on screen: after Scene 5, hold the finished diagram for about 2.5 s, fade the scene out gently, and restart from Scene 1. There must be no jump or flash at the restart.
+- Still **pause when off-screen** and resume when it comes back into view.
+- **Shorten Scene 1 (vendors):** the logos pop in faster (about 0.12 s apart, each pop about 0.35 s) with a short hold of about 0.4 s. The whole scene should take about 1.2 s instead of 2.5 s. Tighten the other holds slightly so one loop runs about 9–10 s.
+- With `prefers-reduced-motion`: show the final diagram, static, with no loop.
 
-**Scene 2: Convergence (~1.5 s)**
-- Instead of a plain fade-out, each logo **shrinks and glides toward the centre** of the block (`power2.inOut`), dissolving into a small amber point of light as it travels.
-- The four points meet at the column's base position and flash softly once. That flash is where the column will rise from.
+### Tweak 4: chemical-engineering doodle background in the fractionation block
+- Replace the plain white/blank background of the `.pfd` block with a **WhatsApp-chat-style doodle pattern**: many small, scattered line icons of chemical-engineering equipment in a P&ID / hand-drawn style:
+  - distillation column, shell-and-tube heat exchanger, centrifugal pump, valve (bow-tie), storage tank, reactor with agitator, cooling tower, flask, pressure gauge, compressor, cyclone, pipe elbow.
+- Draw them as simple thin-stroke SVG icons, varied in size (about 24–40 px) and rotation, spread unevenly so it looks hand-scattered rather than grid-like. Build it as one repeating SVG tile so it's light.
+- Keep it **very faint** (about 6–10% opacity, in the navy or emerald tone) so the column, arrows and logos remain the clear focus and stay readable.
+- **Subtle motion:** the pattern drifts very slowly (one full tile every 40–60 s), and a few icons gently bob or rotate a few degrees. Calm, never busy. Off for `prefers-reduced-motion`; paused when off-screen.
+- This replaces the faint blueprint grid from Step 2. Scene 1 should now fade in the doodle pattern instead.
 
-**Scene 3: Erection (~3 s)**
-Build the column the way a real one goes up on site, bottom to top:
-- The bottom head and skirt draw first (SVG stroke drawing).
-- Then each shell section **lowers into place from slightly above**, like a crane lift, with a tiny settle at the end (`power3.out`). Stack in order: bottom section with sump, packed bed 1, liquid distributor, packed bed 2, liquid distributor, packed bed 3, top head.
-- **Packing:** draw each bed as structured packing, a fine diagonal crosshatch inside the shell. Distributors are thin horizontal bars with small drip points.
-- Last, the **reboiler** (bottom, beside the sump) and the **condenser** (top) draw in with their connecting pipes. Pipes draw along their length as if being run.
-
-**Scene 4: Commissioning (~3 s)**
-Start the column up in the same order a real start-up follows:
-1. **Heat on:** the reboiler glows warm, and bubbles start in the sump.
-2. **Column heats up:** a warm-to-cool temperature gradient (amber at the bottom fading to a cool emerald/teal at the top, matching the site palette) **fills upward** inside the shell, like the temperature profile establishing.
-3. **Vapour rises:** small soft dots travel up through the packing (slightly zig-zag, as if finding a path through it).
-4. **Overhead and reflux:** when the first vapour reaches the top, the condenser activates (a subtle cool pulse), and then **liquid starts trickling down** through the packing as thin streaks, slower than the vapour.
-This order (heat, vapour up, then reflux down) must be kept. It's what makes it read as a real column to an engineer.
-
-**Scene 5: The network (~2 s)**
-- The four arrows draw out from the column to the four corner positions (same layout as the current diagram), staggered about 0.2 s apart.
-- As each arrow arrives, its logo, flag and country label pop back in at the arrow's end.
-- A single soft pulse travels along each arrow once, then the arrows settle into the slow dashed "flow" style the current diagram uses.
-
-**Resting state (after the sequence)**
-- Only the gentle internal process keeps moving: bubbles in the sump, vapour rising, liquid trickling, and the slow dashed flow on the arrows. All of it is calm and slow. A visitor should be able to read the logos without being distracted.
-- Particle limits so it stays light: about 12 vapour dots, 8 liquid streaks and 6 bubbles at once, recycled in loops.
-
-**One interaction**
-- Hovering over (or tapping, on a phone) a vendor logo highlights its arrow in amber and gently dims the other three. Moving away restores them. Nothing else is interactive.
-
-**Behaviour**
-- The sequence starts when the block is about 40% into view and plays **once**. After that it rests in the final state.
-- A small, discreet **"Replay"** button (an icon with that word) sits in the bottom-left corner of the block and restarts the full sequence.
-- Pause all motion when the block is off-screen.
-- With `prefers-reduced-motion`: skip the sequence and show the final diagram with no motion.
-- Keep the block's existing heading and caption text exactly as they are. **Don't add any new words or labels** inside the animation.
-- Colours: use the site palette, emerald and amber, with the existing dark navy column body if it still fits.
-- **Phone width:** scale the scene so logos stay readable. If they get too small, place two vendors above the column and two below instead of in the corners, and shorten the arrows to match.
-- Animate only transform, opacity and SVG stroke drawing. Use GSAP core + ScrollTrigger only, with no other plugins unless they're free and genuinely needed.
-- Timing guide: the full sequence is about 12 seconds. If it feels long when you watch it, tighten the holds rather than speeding up the motion.
-
-### When Step 2 is done
-- Push to `redesign-step1` and give me the updated deploy preview link.
-- Give me a short screen recording or GIF of the fractionation sequence, plus before/after notes for the two fixes.
-- List anything you weren't sure about.
+### When Step 2b is done
+- Push to `redesign-step1` and send me the deploy preview link.
+- Send a short GIF of the loader and one loop of the fractionation animation.
+- One short list: what changed and anything you weren't sure about. Nothing else.
 - Wait for my review. Don't put anything on the live site.
