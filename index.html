@@ -80,7 +80,7 @@ section{max-width:1120px;margin:0 auto;padding:4.5rem 1.2rem 1rem;position:relat
 
 /* flowing scroll line (drawn behind the content blocks) */
 .flow-svg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
-.flow-svg path{fill:none;stroke:var(--green);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.5;stroke-dasharray:1;stroke-dashoffset:0}
+.flow-svg path{fill:none;stroke:var(--green);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.5}
 @media (max-width:900px){.flow-svg path{stroke-width:4}}
 
 /* content blocks: each job / project is its own light card */
@@ -281,7 +281,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
 </header>
 
 <main>
-<svg class="flow-svg" aria-hidden="true" focusable="false"><path id="flowPath" pathLength="1" d=""/></svg>
+<svg class="flow-svg" aria-hidden="true" focusable="false"><path id="flowPath" d=""/></svg>
 
 <section id="about">
   <div class="plate"><span class="tag">SEC-01</span><h2>About me</h2></div>
@@ -590,13 +590,17 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
       const plate = s.querySelector('.plate');
       const top = s.offsetTop + (plate ? plate.offsetTop + plate.offsetHeight / 2 : 0);
       const bottom = s.offsetTop + s.offsetHeight;
-      curve(side, top);                                            // swing across to this section
-      curve(side + (left ? wig : -wig), top + (bottom - top) * .5); // gentle wiggle alongside
-      curve(side, bottom - 10);
+      curve(side, top);                                             // swing across to this section
+      curve(side + (left ? wig : -wig), top + (bottom - top) * .45); // gentle wiggle alongside
     });
     curve(narrow ? gut : W / 2, H);
     path.setAttribute('d', d);
+    len = path.getTotalLength();
+    path.style.strokeDasharray = len + ' ' + len;
+    drawLine();
   }
+  let len = 0, drawn = 1; // drawn: 0..1 share of the line that is visible
+  function drawLine(){ path.style.strokeDashoffset = len * (1 - drawn); }
 
   if (!window.gsap || !window.ScrollTrigger) { buildPath(); return; } // no CDN: static, fully drawn line
   gsap.registerPlugin(ScrollTrigger);
@@ -606,14 +610,18 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
   const mm = gsap.matchMedia();
   mm.add('(prefers-reduced-motion: no-preference)', () => {
     // 1) flowing line draws itself in step with scroll
-    gsap.fromTo(path, {strokeDashoffset: 1}, {
-      strokeDashoffset: 0, ease: 'none',
+    const line = {p: 0};
+    drawn = 0; drawLine();
+    gsap.to(line, {
+      p: 1, ease: 'none',
+      onUpdate: () => { drawn = line.p; drawLine(); },
       scrollTrigger: {trigger: main, start: 'top 75%', end: 'bottom 75%', scrub: .8}
     });
+    return () => { drawn = 1; drawLine(); };
 
     // 2) contract / expand: hero recedes as you leave it, blocks grow into place as they arrive
     gsap.to('.hero', {
-      scale: .94, opacity: .6, ease: 'none',
+      scale: .94, ease: 'none',
       scrollTrigger: {trigger: '.hero', start: 'top top', end: 'bottom top', scrub: .6}
     });
     gsap.utils.toArray('.blk, .card, .award, .cert-shot, .cert-meta').forEach(el => {
