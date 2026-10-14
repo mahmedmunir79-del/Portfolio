@@ -425,7 +425,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
           <rect class="sec" x="418" y="118" width="64" height="60"/>
           <path class="sec" d="M418 118V100A32 14 0 0 1 482 100V118Z"/>
         </g>
-        <rect class="tprof" x="420" y="100" width="60" height="272" fill="url(#tprof)" opacity=".42"/>
+        <rect class="tprof" x="420" y="100" width="60" height="272" fill="url(#tprof)" opacity=".6" style="mix-blend-mode:screen"/>
         <!-- internals, one group per shell section -->
         <g>
           <g class="sec-in"><rect x="420" y="352" width="60" height="19" fill="#0E9F6E" opacity=".45"/></g>
@@ -456,7 +456,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
             <use href="#flag-my" x="-27" y="44"/>
             <text x="7" y="58" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">MALAYSIA</text>
           </g></g>
-          <circle class="v-dot" r="5" fill="url(#glowA)" opacity="0"/>
+          <g class="v-dot" opacity="0"><circle r="11" fill="url(#glowA)"/><circle r="3.6" fill="#FFC45C"/></g>
         </g>
         <g class="vendor" tabindex="0" aria-label="JJ-Lurgi, Malaysia" transform="translate(745 78)">
           <rect class="v-hit" x="-96" y="-40" width="192" height="108" rx="8" fill="transparent"/>
@@ -465,7 +465,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
             <use href="#flag-my" x="-27" y="44"/>
             <text x="7" y="58" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">MALAYSIA</text>
           </g></g>
-          <circle class="v-dot" r="5" fill="url(#glowA)" opacity="0"/>
+          <g class="v-dot" opacity="0"><circle r="11" fill="url(#glowA)"/><circle r="3.6" fill="#FFC45C"/></g>
         </g>
         <!-- CMB: placeholder plate until logo upload -->
         <g class="vendor" tabindex="0" aria-label="CMB, Italy" transform="translate(160 300)">
@@ -478,7 +478,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
             <use href="#flag-it" x="-27" y="36"/>
             <text x="7" y="50" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">ITALY</text>
           </g></g>
-          <circle class="v-dot" r="5" fill="url(#glowA)" opacity="0"/>
+          <g class="v-dot" opacity="0"><circle r="11" fill="url(#glowA)"/><circle r="3.6" fill="#FFC45C"/></g>
         </g>
         <g class="vendor" tabindex="0" aria-label="Technoilogy, Italy" transform="translate(745 298)">
           <rect class="v-hit" x="-56" y="-40" width="112" height="104" rx="8" fill="transparent"/>
@@ -487,7 +487,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
             <use href="#flag-it" x="-27" y="40"/>
             <text x="7" y="54" font-family="IBM Plex Mono, monospace" font-size="10" fill="#67808C" letter-spacing="1.5">ITALY</text>
           </g></g>
-          <circle class="v-dot" r="5" fill="url(#glowA)" opacity="0"/>
+          <g class="v-dot" opacity="0"><circle r="11" fill="url(#glowA)"/><circle r="3.6" fill="#FFC45C"/></g>
         </g>
 
         <circle class="flash" cx="450" cy="400" r="26" fill="url(#glowA)" opacity="0"/>
@@ -923,11 +923,12 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
       gsap.set(metas, {opacity: 0, y: 8});
       gsap.set(dots, {opacity: 0, scale: .4, x: 0, y: 0, transformOrigin: '50% 50%'});
       gsap.set(flash, {opacity: 0, scale: .2, transformOrigin: '50% 50%'});
-      gsap.set(draws, {strokeDasharray: (i, el) => `${lens.get(el)} ${lens.get(el)}`, strokeDashoffset: (i, el) => lens.get(el)});
+      // gap a little longer than the dash so no speck shows at the far end before drawing
+      gsap.set(draws, {strokeDasharray: (i, el) => `${lens.get(el)} ${lens.get(el) + 10}`, strokeDashoffset: (i, el) => lens.get(el)});
       gsap.set([headFill, rebBody, condBody, label, rebGlow, rebWarm, condGlow], {opacity: 0});
       gsap.set([...secs, ...secIns], {opacity: 0, y: -26});
       gsap.set(tprof, {scaleY: 0, transformOrigin: '50% 100%'});
-      gsap.set(lines, {strokeDasharray: i => `${arrowLen[i]} ${arrowLen[i]}`, strokeDashoffset: i => arrowLen[i]});
+      gsap.set(lines, {strokeDasharray: i => `${arrowLen[i]} ${arrowLen[i] + 10}`, strokeDashoffset: i => arrowLen[i]});
       gsap.set(heads, {opacity: 0});
       gsap.set(pulses, {opacity: 0, x: 0, y: 0});
     };
