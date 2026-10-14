@@ -689,7 +689,12 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
     const full = tipY >= height, y = Math.max(0, Math.min(tipY, height));
     let lo = 0, hi = samples.length - 1;
     while (lo < hi) { const m = (lo + hi) >> 1; if (samples[m][1] < y) lo = m + 1; else hi = m; }
-    const l = full ? len : samples[lo][0];
+    let l = samples[lo][0];
+    if (lo > 0 && samples[lo][1] > samples[lo - 1][1]) { // interpolate so the tip never sits below y
+      const [l0, y0] = samples[lo - 1], y1 = samples[lo][1];
+      l = l0 + (l - l0) * (y - y0) / (y1 - y0);
+    }
+    if (full) l = len;
     path.style.strokeDashoffset = len - l;
     // glowing tip marks the drawing end of the line
     const pt = path.getPointAtLength(l);
