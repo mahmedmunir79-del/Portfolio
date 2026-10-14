@@ -36,6 +36,22 @@ a{color:var(--green);text-decoration:none}
 a:hover{text-decoration:underline}
 :focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 
+/* ---------- intro loader (once per visit) ---------- */
+html.intro-on{overflow:hidden}
+#intro{position:fixed;inset:0;z-index:1000;color:#fff;transition:opacity .3s}
+#intro.in-gone{opacity:0}
+.in-half{position:absolute;left:0;right:0;height:50.5%;background:var(--ink)}
+.in-top{top:0}.in-bot{bottom:0}
+.in-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.3rem;padding:0 16px}
+.in-ticker{position:relative;height:1.7em;width:min(100%,30rem);overflow:hidden;font-family:var(--mono);font-size:clamp(.8rem,2.6vw,.95rem);letter-spacing:.08em;color:#B9C8CF}
+.in-ticker span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:translateY(110%)}
+.in-bar{width:min(56vw,260px);height:2px;background:rgba(255,255,255,.14);overflow:hidden}
+.in-bar i{display:block;height:100%;background:var(--green);transform:scaleX(0);transform-origin:left}
+.in-final{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 16px;margin:0;text-align:center;
+  font-family:var(--disp);font-weight:800;font-size:clamp(2.1rem,7vw,4.6rem);line-height:1.02;text-transform:uppercase;letter-spacing:.01em;opacity:0}
+.in-count{position:absolute;left:clamp(16px,4vw,48px);bottom:clamp(10px,3vw,28px);font-family:var(--disp);font-weight:700;
+  font-size:clamp(3rem,12vw,7rem);line-height:1;color:#fff;opacity:.85}
+
 /* ---------- nav ---------- */
 nav{position:sticky;top:0;z-index:50;background:rgba(15,30,40,.94);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.08)}
 .nav-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.2rem}
@@ -79,7 +95,7 @@ section{max-width:1120px;margin:0 auto;padding:4.5rem 1.2rem 1rem;position:relat
 
 /* flowing scroll line (drawn behind the content blocks) */
 .flow-svg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}
-.flow-svg path{fill:none;stroke:var(--green);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.5}
+.flow-svg path{fill:none;stroke:var(--green);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
 .flow-svg circle{fill:var(--green);stroke:var(--tint-g);stroke-width:4;opacity:0;transition:opacity .3s}
 @media (max-width:900px){.flow-svg path{stroke-width:4}.flow-svg circle{r:5}}
 
@@ -141,16 +157,21 @@ section{max-width:1120px;margin:0 auto;padding:4.5rem 1.2rem 1rem;position:relat
 
 /* ---------- fractionation PFD block ---------- */
 .pfd{margin:0 0 2rem;border-radius:16px;background:#FBFDFF;border:1.5px solid var(--ink);padding:1.6rem 1.4rem 1.2rem;position:relative;overflow:hidden}
-.pfd::before{content:"";position:absolute;inset:0;opacity:var(--grid,.05);background-image:linear-gradient(var(--ink) 1px,transparent 1px),linear-gradient(90deg,var(--ink) 1px,transparent 1px);background-size:44px 44px}
+/* chemical-engineering doodle background: one faint repeating tile that drifts slowly,
+   plus a few loose icons that bob gently */
+.pfd-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:.09}
+.pfd-doodle{position:absolute;top:-320px;left:-320px;right:0;bottom:0;background:url("images/doodle.svg") 0 0/320px 320px repeat;
+  animation:doodleDrift 50s linear infinite;will-change:transform}
+@keyframes doodleDrift{to{transform:translate3d(320px,320px,0)}}
+.pfd .pfd-float{position:absolute;display:block;width:34px;height:34px;fill:none;stroke:#16303F;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;
+  animation:doodleBob 7s ease-in-out infinite alternate}
+@keyframes doodleBob{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-6px) rotate(4deg)}}
+.pfd.is-off .pfd-bg *{animation-play-state:paused}
+@media (prefers-reduced-motion: reduce){.pfd-bg *{animation:none}}
 .pfd h4{position:relative;font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green-dk);margin-bottom:1rem}
 .pfd svg{position:relative;width:100%;height:auto;display:block}
 .pfd .cap{position:relative;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);margin-left:auto;text-align:right}
 .pfd-foot{position:relative;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:.8rem}
-.pfd-replay{display:inline-flex;align-items:center;gap:.4rem;flex:none;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--steel);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:.35rem .75rem;cursor:pointer;transition:color .2s,border-color .2s}
-.pfd-replay:hover{color:var(--green-dk);border-color:var(--green)}
-.pfd-replay[hidden]{display:none}
-.pfd .pfd-replay svg{width:12px;height:12px;display:inline;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 /* vendor network: arrows + one hover/tap highlight */
 .pfd-svg .arr-line{fill:none;stroke:var(--green);stroke-width:2;stroke-dasharray:7 5;transition:stroke .3s,stroke-width .3s}
 .pfd-svg .arr-head{fill:var(--green);transition:fill .3s}
@@ -247,6 +268,34 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
 </style>
 </head>
 <body>
+<div id="intro" aria-hidden="true">
+  <div class="in-half in-top"></div><div class="in-half in-bot"></div>
+  <div class="in-stage">
+    <div class="in-ticker">
+      <span>Heating up the reboiler…</span><span>Establishing reflux…</span><span>Checking the mass balance…</span><span>Venting the last bit of steam…</span>
+    </div>
+    <div class="in-bar"><i></i></div>
+  </div>
+  <p class="in-final">Let's blow off some steam together.</p>
+  <div class="in-count">000</div>
+</div>
+<script>
+// Intro shows once per visit. Hard cap: whatever happens (slow network, no JS library), it is gone by 3 s.
+(function(){
+  var el = document.getElementById('intro'), seen = false;
+  try { seen = sessionStorage.getItem('introSeen') === '1'; sessionStorage.setItem('introSeen', '1'); } catch (e) {}
+  if (seen) { el.remove(); return; }
+  var root = document.documentElement;
+  root.classList.add('intro-on');
+  window.__introStart = Date.now();
+  window.__endIntro = function(){ // plain fade-out fallback; replaced by the animated version when GSAP loads
+    if (!el.isConnected) return;
+    el.classList.add('in-gone');
+    setTimeout(function(){ el.remove(); root.classList.remove('intro-on'); }, 300);
+  };
+  setTimeout(function(){ window.__endIntro(); }, 3000);
+})();
+</script>
 
 <nav>
   <div class="nav-in">
@@ -354,6 +403,14 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
     </article>
 
     <div class="pfd">
+      <div class="pfd-bg" aria-hidden="true">
+        <div class="pfd-doodle"></div>
+        <!-- a few loose icons that bob gently on top of the drifting tile -->
+        <svg class="pfd-float" viewBox="0 0 32 32" style="left:7%;top:62%"><path d="M10 9a6 6 0 0 1 12 0v14a6 6 0 0 1-12 0z M10 13h12 M10 18h12 M22 11h5 M5 25h5"/></svg>
+        <svg class="pfd-float" viewBox="0 0 32 32" style="left:62%;top:12%;animation-delay:-2.5s;animation-duration:8s"><circle cx="16" cy="13" r="9"/><path d="M16 13l5-4 M16 22v7 M12 29h8"/></svg>
+        <svg class="pfd-float" viewBox="0 0 32 32" style="left:86%;top:70%;animation-delay:-4s;animation-duration:9s"><path d="M4 10l12 6-12 6z M28 10l-12 6 12 6z M16 16V7 M11 7h10"/></svg>
+        <svg class="pfd-float" viewBox="0 0 32 32" style="left:34%;top:84%;animation-delay:-1s;animation-duration:7.5s"><path d="M13 3h6 M14 3v9L6 28h20l-8-16V3 M10 21h12"/></svg>
+      </div>
       <h4>PRJ-150 · Fractionation Column — Vendor Network</h4>
       <svg class="pfd-svg" viewBox="0 20 900 420" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Process flow diagram: fractionation column connected to vendors Desmet, JJ-Lurgi, CMB and Technoilogy">
         <defs>
@@ -386,8 +443,9 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
           </g>
         </defs>
         <!-- The markup below is the finished, resting diagram (shown as-is without JS or with reduced motion).
-             The script hides it and replays the build sequence: vendors → convergence → erection → start-up → network. -->
+             The script hides it and loops the build sequence: vendors → convergence → erection → start-up → network. -->
 
+        <g class="scene">
         <!-- piping (runs behind the equipment) -->
         <g fill="none" stroke="#5A717C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path class="draw pipe-reb" d="M418 366H374"/>
@@ -489,9 +547,9 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
         </g>
 
         <circle class="flash" cx="450" cy="400" r="26" fill="url(#glowA)" opacity="0"/>
+        </g>
       </svg>
       <div class="pfd-foot">
-        <button class="pfd-replay" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4.5v4h4"/></svg>Replay</button>
         <div class="cap">150 TPD fatty acid fractionation &amp; distillation — international vendor network</div>
       </div>
     </div>
@@ -645,6 +703,66 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script>
+/* ---------- intro loader: ticker → final line → zoom reveal (≤ 3 s, once per visit) ---------- */
+(function(){
+  const el = document.getElementById('intro');
+  if (!el || !window.gsap) return; // already skipped, or no GSAP: the inline fallback fades it out
+  const root = document.documentElement;
+  const settle = gsap.utils.toArray('nav, .hero-in, .kpis-in');
+  const lines = gsap.utils.toArray('#intro .in-ticker span');
+  const bar = el.querySelector('.in-bar i'), count = el.querySelector('.in-count'), fin = el.querySelector('.in-final');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let tl;
+  const finish = () => {
+    if (!el.isConnected) return;
+    el.remove(); root.classList.remove('intro-on');
+    gsap.set(settle, {clearProps: 'transform'});
+    removeEventListener('pointerdown', skip); removeEventListener('wheel', skip);
+    removeEventListener('touchstart', skip); removeEventListener('keydown', skip);
+    if (window.ScrollTrigger) ScrollTrigger.refresh(); // scrollbar is back: re-measure
+  };
+  function skip(){ // any click, tap, scroll or key: get out of the way immediately
+    if (tl) tl.kill();
+    gsap.to(el, {opacity: 0, duration: .25, onComplete: finish});
+    gsap.to(settle, {scale: 1, duration: .25});
+  }
+  window.__endIntro = skip; // the 3 s hard cap now uses the same quick exit
+  addEventListener('pointerdown', skip); addEventListener('wheel', skip, {passive: true});
+  addEventListener('touchstart', skip, {passive: true}); addEventListener('keydown', skip);
+
+  if (reduce) { // reduced motion: the final line, then a quick fade
+    gsap.set(el.querySelectorAll('.in-stage, .in-count'), {opacity: 0});
+    gsap.set(fin, {opacity: 1});
+    tl = gsap.timeline({onComplete: finish}).to(el, {opacity: 0, duration: .4}, .6);
+    return;
+  }
+
+  gsap.set(settle, {scale: 1.04, transformOrigin: '50% 0%'});
+  tl = gsap.timeline({onComplete: finish});
+  // 1) loader: bar + counter fill while the engineering lines roll up one after another
+  const FILL = 1.5, step = FILL / lines.length, c = {v: 0};
+  tl.to(bar, {scaleX: 1, duration: FILL, ease: 'power1.inOut'}, 0)
+    .to(c, {v: 100, duration: FILL, ease: 'power1.inOut',
+      onUpdate: () => { count.textContent = String(Math.round(c.v)).padStart(3, '0'); }}, 0);
+  lines.forEach((ln, i) => {
+    tl.fromTo(ln, {yPercent: 110}, {yPercent: 0, duration: .2, ease: 'power2.out'}, i * step)
+      .to(ln, {yPercent: -110, duration: .2, ease: 'power2.in'}, (i + 1) * step - .05);
+  });
+  // 2) the ticker stops on the final line, held briefly
+  tl.to([el.querySelector('.in-stage'), count], {opacity: 0, duration: .25}, FILL)
+    .fromTo(fin, {opacity: 0, y: 40}, {opacity: 1, y: 0, duration: .35, ease: 'power3.out'}, FILL);
+  // 3) zoom reveal: the line flies toward the viewer while the panel splits open
+  const Z = FILL + .6;
+  tl.to(fin, {scale: 2.6, opacity: 0, duration: .6, ease: 'power2.in'}, Z)
+    .to(el.querySelector('.in-top'), {yPercent: -100, duration: .65, ease: 'power3.inOut'}, Z + .05)
+    .to(el.querySelector('.in-bot'), {yPercent: 100, duration: .65, ease: 'power3.inOut'}, Z + .05)
+    .to(settle, {scale: 1, duration: .7, ease: 'power2.out'}, Z + .05);
+  // never past 3 s in total: if the page was slow to get here, play the intro faster
+  const left = 2.9 - (Date.now() - (window.__introStart || Date.now())) / 1000;
+  if (left < .5) skip();
+  else if (left < tl.duration()) tl.timeScale(tl.duration() / left);
+})();
+
 // Smooth scrolling for in-page links only. (CSS scroll-behavior:smooth on <html> would also
 // smooth ScrollTrigger's own measuring scrolls and throw off every scroll animation.)
 document.addEventListener('click', e => {
@@ -877,7 +995,7 @@ document.addEventListener('click', e => {
     const flash = one('.flash'), tprof = one('.tprof'), label = one('.col-label');
     const headFill = one('.head-fill'), rebBody = one('.reb-body'), condBody = one('.cond-body');
     const rebGlow = one('.reb-glow'), rebWarm = one('.reb-warm'), condGlow = one('.cond-glow');
-    const replay = pfd.querySelector('.pfd-replay');
+    const bg = pfd.querySelector('.pfd-bg'), scene = one('.scene');
 
     // particles, recycled in loops: 6 bubbles, 12 vapour dots, 8 liquid streaks
     const parts = one('.parts'), NS = 'http://www.w3.org/2000/svg';
@@ -896,7 +1014,7 @@ document.addEventListener('click', e => {
     const particles = [...bubbles, ...vapour, ...liquid];
 
     // ---- loops (resting state) ----
-    const VAPOUR_T = 2.4, LIQUID_T = 4.6;
+    const VAPOUR_T = 2.2, LIQUID_T = 4.6;
     let loops = [], visible = true, started = false;
     const loop = t => { if (!visible) t.pause(); loops.push(t); return t; };
     const killLoops = () => {
@@ -928,7 +1046,8 @@ document.addEventListener('click', e => {
     let tl, arrowLen = [];
     const hide = () => {
       arrowLen = lines.map(l => Math.hypot(l.x2.baseVal.value - l.x1.baseVal.value, l.y2.baseVal.value - l.y1.baseVal.value));
-      gsap.set(pfd, {'--grid': 0});
+      gsap.set(bg, {opacity: 0});
+      gsap.set(scene, {opacity: 1});
       gsap.set(logos, {opacity: 0, scale: .6, x: 0, y: 0, transformOrigin: '50% 50%'});
       gsap.set(metas, {opacity: 0, y: 8});
       gsap.set(dots, {opacity: 0, scale: .4, x: 0, y: 0, transformOrigin: '50% 50%'});
@@ -947,37 +1066,38 @@ document.addEventListener('click', e => {
 
     function build(){
       const L = LAYOUTS[mode];
-      tl = gsap.timeline({paused: true, defaults: {immediateRender: false}});
+      // loops forever: when the timeline completes, it starts again from Scene 1
+      tl = gsap.timeline({paused: true, defaults: {immediateRender: false}, onComplete: () => play()});
 
-      // Scene 1 — the vendors (blueprint grid, then logos pop in one after another, then a hold)
-      tl.to(pfd, {'--grid': .05, duration: .6, ease: 'power1.out'}, 0);
+      // Scene 1 — the vendors (doodle background fades in, logos pop in quickly, short hold)
+      tl.fromTo(bg, {opacity: 0}, {opacity: .09, duration: .5, ease: 'power1.out'}, 0);
       logos.forEach((lg, i) => {
-        const at = .35 + i * .25;
-        tl.fromTo(lg, {opacity: 0, scale: .6}, {opacity: 1, scale: 1, duration: .5, ease: 'back.out(1.7)'}, at);
-        tl.fromTo(metas[i], {opacity: 0, y: 8}, {opacity: 1, y: 0, duration: .35, ease: 'power2.out'}, at + .18);
+        const at = .1 + i * .12;
+        tl.fromTo(lg, {opacity: 0, scale: .6}, {opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.7)'}, at);
+        tl.fromTo(metas[i], {opacity: 0, y: 8}, {opacity: 1, y: 0, duration: .25, ease: 'power2.out'}, at + .12);
       });
 
       // Scene 2 — convergence: each logo shrinks and glides to the column base as an amber point
-      const S2 = 2.4;
+      const S2 = 1.2;
       vendors.forEach((v, i) => {
         const dx = BASE[0] - L.v[i][0], dy = BASE[1] - L.v[i][1], at = S2 + i * .05;
         tl.to(metas[i], {opacity: 0, y: 6, duration: .3, ease: 'power1.in'}, S2);
-        tl.fromTo(logos[i], {x: 0, y: 0, scale: 1, opacity: 1}, {x: dx, y: dy, scale: .12, opacity: 0, duration: 1.2, ease: 'power2.inOut'}, at);
-        tl.fromTo(dots[i], {x: 0, y: 0, scale: .4, opacity: 0}, {x: dx, y: dy, scale: 1, opacity: 1, duration: 1.2, ease: 'power2.inOut'}, at);
+        tl.fromTo(logos[i], {x: 0, y: 0, scale: 1, opacity: 1}, {x: dx, y: dy, scale: .12, opacity: 0, duration: 1, ease: 'power2.inOut'}, at);
+        tl.fromTo(dots[i], {x: 0, y: 0, scale: .4, opacity: 0}, {x: dx, y: dy, scale: 1, opacity: 1, duration: 1, ease: 'power2.inOut'}, at);
       });
-      const meet = S2 + .15 + 1.2;
+      const meet = S2 + .15 + 1;
       tl.fromTo(flash, {opacity: 0, scale: .2}, {opacity: .95, scale: 1.5, duration: .22, ease: 'power2.out'}, meet - .05)
         .to(flash, {opacity: 0, scale: 2.2, duration: .5, ease: 'power1.out'}, '>')
         .to(dots, {opacity: 0, duration: .2}, meet);
 
       // Scene 3 — erection, bottom to top: head + skirt, then each shell section is lowered in
       // like a crane lift, then the reboiler and condenser with their pipes run along their length
-      const S3 = meet + .35;
-      drawIn([one('.base-line'), one('.head-line')], S3, .55);
-      tl.fromTo(headFill, {opacity: 0}, {opacity: 1, duration: .3}, S3 + .35);
+      const S3 = meet + .2;
+      drawIn([one('.base-line'), one('.head-line')], S3, .5);
+      tl.fromTo(headFill, {opacity: 0}, {opacity: 1, duration: .3}, S3 + .3);
       secs.forEach((s, i) => tl.fromTo([s, secIns[i]], {y: -26, opacity: 0},
-        {y: 0, opacity: 1, duration: .38, ease: 'power3.out'}, S3 + .6 + i * .22));
-      const EQ = S3 + .6 + secs.length * .22 + .1;
+        {y: 0, opacity: 1, duration: .36, ease: 'power3.out'}, S3 + .5 + i * .18));
+      const EQ = S3 + .5 + secs.length * .18 + .1;
       drawIn($$('.pipe-reb'), EQ, .5);
       drawIn($$('.pipe-cond'), EQ, .6);
       tl.fromTo([rebBody, condBody], {opacity: 0}, {opacity: 1, duration: .4}, EQ + .25)
@@ -985,20 +1105,20 @@ document.addEventListener('click', e => {
 
       // Scene 4 — commissioning, in start-up order: heat on → temperature profile builds upward
       // → vapour rises → condenser comes on when vapour reaches the top → reflux trickles down
-      const S4 = EQ + .9;
-      tl.fromTo(rebGlow, {opacity: 0}, {opacity: .85, duration: .6}, S4)
-        .fromTo(rebWarm, {opacity: 0}, {opacity: .35, duration: .6}, S4)
-        .call(startBubbles, null, S4 + .3)
-        .fromTo(tprof, {scaleY: 0}, {scaleY: 1, duration: 1.1, ease: 'power1.inOut'}, S4 + .45)
-        .call(startVapour, null, S4 + .8);
-      const TOP = S4 + .8 + VAPOUR_T; // first vapour dot reaches the top head
+      const S4 = EQ + .7;
+      tl.fromTo(rebGlow, {opacity: 0}, {opacity: .85, duration: .5}, S4)
+        .fromTo(rebWarm, {opacity: 0}, {opacity: .35, duration: .5}, S4)
+        .call(startBubbles, null, S4 + .25)
+        .fromTo(tprof, {scaleY: 0}, {scaleY: 1, duration: 1, ease: 'power1.inOut'}, S4 + .35)
+        .call(startVapour, null, S4 + .6);
+      const TOP = S4 + .6 + VAPOUR_T; // first vapour dot reaches the top head
       tl.fromTo(condGlow, {opacity: 0}, {opacity: .9, duration: .25, ease: 'power2.out'}, TOP - .15)
         .to(condGlow, {opacity: .45, duration: .6}, '>')
         .call(startLiquid, null, TOP + .1);
 
       // Scene 5 — the network: arrows draw out, each vendor pops back in at its arrow's end,
       // one soft pulse runs along each arrow, then the arrows settle into the slow dashed flow
-      const S5 = TOP + .3;
+      const S5 = TOP + .25;
       arrows.forEach((a, i) => {
         const at = S5 + i * .2, [x1, y1, x2, y2] = L.a[i];
         tl.fromTo(lines[i], {strokeDashoffset: arrowLen[i]}, {strokeDashoffset: 0, duration: .5, ease: 'power2.out'}, at)
@@ -1009,7 +1129,10 @@ document.addEventListener('click', e => {
           .fromTo(pulses[i], {opacity: 0}, {opacity: .95, duration: .15}, at + .55)
           .to(pulses[i], {opacity: 0, duration: .2}, at + 1.05);
       });
-      tl.call(startFlow, null, S5 + 3 * .2 + 1.3);
+      const END = S5 + 3 * .2 + 1.3;
+      tl.call(startFlow, null, END);
+      // hold the finished diagram, then fade everything out gently before the next loop
+      tl.to([scene, bg], {opacity: 0, duration: .7, ease: 'power1.inOut'}, END + 2.5);
       return tl;
     }
 
@@ -1019,43 +1142,34 @@ document.addEventListener('click', e => {
       tl.restart();
       if (!visible) tl.pause();
     }
-    const finish = () => { // jump straight to the resting state
-      killLoops();
-      tl.progress(1, true);
-      startBubbles(); startVapour(); startLiquid(); startFlow();
-    };
 
     hide();
     build();
 
-    // play once when the block is ~40% into view; pause everything while it is off-screen
+    // start when the block is ~40% into view, then loop; pause everything while it is off-screen
     ScrollTrigger.create({trigger: pfd, start: '40% bottom', once: true, onEnter: () => { if (!started) play(); }});
     ScrollTrigger.create({trigger: pfd, start: 'top bottom', end: 'bottom top', onToggle: self => {
       visible = self.isActive;
-      if (started && tl.progress() < 1) visible ? tl.resume() : tl.pause();
+      pfd.classList.toggle('is-off', !visible);
+      if (started) visible ? tl.resume() : tl.pause();
       loops.forEach(t => visible ? t.resume() : t.pause());
     }});
-    replay.hidden = false;
-    replay.addEventListener('click', play);
 
-    // phone ⇄ desktop layout switch: rebuild for the new positions
+    // phone ⇄ desktop layout switch: rebuild for the new positions and start the loop again
     onLayout = () => {
-      const done = started && tl.progress() === 1;
       tl.kill(); killLoops(); hide(); build();
-      if (done) finish(); else if (started) play();
+      if (started) play();
     };
 
     return () => { // reduced motion switched on: back to the static final diagram
       onLayout = null;
       tl.kill(); loops.forEach(t => t.kill());
-      replay.hidden = true;
-      replay.removeEventListener('click', play);
       particles.forEach(p => p.remove());
       const touched = [...logos, ...metas, ...dots, flash, ...draws, headFill, rebBody, condBody, label,
-        rebGlow, rebWarm, condGlow, ...secs, ...secIns, tprof, ...lines, ...heads, ...pulses];
+        rebGlow, rebWarm, condGlow, ...secs, ...secIns, tprof, ...lines, ...heads, ...pulses, scene, bg];
       gsap.set(touched, {clearProps: 'all'});
       [...logos, ...metas, ...dots, flash, ...secs, ...secIns, tprof, ...pulses].forEach(el => el.removeAttribute('transform'));
-      pfd.style.removeProperty('--grid');
+      pfd.classList.remove('is-off');
     };
   });
 })();
