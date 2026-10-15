@@ -1927,5 +1927,37 @@ document.addEventListener('click', e => {
   });
 })();
 </script>
+<script>
+// Anonymous visit ping: no cookies, no IDs, no IP. Sent once per tab session, after the page has loaded.
+// ?owner=on / ?owner=off turns alerts off / back on for the owner's own device.
+(function(){
+  var ls = function(op, k, v){ try { return op === 'get' ? localStorage.getItem(k) : op === 'set' ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) { return null; } };
+  var ss = function(op, k, v){ try { return op === 'get' ? sessionStorage.getItem(k) : sessionStorage.setItem(k, v); } catch (e) { return null; } };
+  try {
+    var url = new URL(location.href), q = url.searchParams, ref = q.get('ref'), owner = q.get('owner');
+    if (owner === 'on') ls('set', 'skipVisitPing', '1');
+    if (owner === 'off') ls('remove', 'skipVisitPing');
+    if (ref !== null || owner !== null) { // keep the address bar clean so forwarded links aren't mis-tagged
+      q.delete('ref'); q.delete('owner');
+      history.replaceState(history.state, '', url.pathname + (q.toString() ? '?' + q.toString() : '') + url.hash);
+    }
+    if (navigator.webdriver || ls('get', 'skipVisitPing') === '1' || ss('get', 'visitPinged') === '1') return;
+    var refDomain = '';
+    try { var r = document.referrer && new URL(document.referrer).hostname; if (r && r !== location.hostname) refDomain = r; } catch (e) {}
+    var data = JSON.stringify({ref: ref || '', referrer: refDomain, page: location.pathname,
+      isPreview: location.hostname !== 'mahmedmunir-portfolio.netlify.app'});
+    var send = function(){
+      try {
+        if (ss('get', 'visitPinged') === '1') return;
+        ss('set', 'visitPinged', '1');
+        if (!(navigator.sendBeacon && navigator.sendBeacon('/api/visit', new Blob([data], {type: 'text/plain'}))))
+          fetch('/api/visit', {method: 'POST', body: data, keepalive: true}).catch(function(){});
+      } catch (e) {}
+    };
+    var later = function(){ (window.requestIdleCallback || function(f){ setTimeout(f, 1500); })(send, {timeout: 4000}); };
+    if (document.readyState === 'complete') later(); else addEventListener('load', later, {once: true});
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

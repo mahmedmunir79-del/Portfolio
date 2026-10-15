@@ -1,0 +1,6 @@
+# Static site published from the repository root; serverless functions live in netlify/functions.
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
