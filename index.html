@@ -1834,7 +1834,7 @@ document.addEventListener('click', e => {
       .to(S.screen, {attr: {fill: '#DCE8F7'}, duration: .12}, S3 + 1.15);
     // camera: measure where the phone screen will be once the arm is raised
     gsap.set(S.arm, {rotation: -78, transformOrigin: ARM});
-    const bb = S.screen.getBBox(), mtx = S.cam.getCTM().inverse().multiply(S.screen.getCTM()), // in viewBox units toV = (x, y) => new DOMPoint(x, y).matrixTransform(mtx);
+    const bb = S.screen.getBBox(), mtx = S.cam.getCTM().inverse().multiply(S.screen.getCTM()) /* viewBox units */, toV = (x, y) => new DOMPoint(x, y).matrixTransform(mtx);
     const p0 = toV(bb.x, bb.y), p1 = toV(bb.x + bb.width, bb.y + bb.height);
     gsap.set(S.arm, {rotation: 0});
     // zoom until the lit phone screen covers the whole block, then the portal rises out of it
