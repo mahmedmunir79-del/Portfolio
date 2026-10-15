@@ -1636,7 +1636,8 @@ document.addEventListener('click', e => {
     const scanLine = el('rect', {x: Q.x - 3, y: Q.y, width: Q.s + 6, height: 1.6, fill: C.green, opacity: 0}, qr);
 
     // the engineer (side view, no face): 13 simple shapes, feet at (120, GY)
-    const eng = el('g', {transform: `translate(120 ${GY})`}, scene);
+    const engPos = el('g', {transform: `translate(120 ${GY})`}, scene);
+    const eng = el('g', {}, engPos); // animated (fade/slide); the outer group holds the position
     const body = el('g', {}, eng);
     const backArm = el('g', {transform: 'translate(-2 -62)'}, body);
     el('rect', {x: -4, y: 0, width: 8, height: 30, rx: 4, fill: C.greenDk}, backArm);
@@ -1664,14 +1665,16 @@ document.addEventListener('click', e => {
     for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; el('path', {d: `M${Math.cos(a) * 12} ${Math.sin(a) * 12}L${Math.cos(a) * 17} ${Math.sin(a) * 17}`, stroke: C.amber, 'stroke-width': 1.6, 'stroke-linecap': 'round'}, rays); }
     const glass = el('path', {d: 'M-3 6h6M-2.5 8.5h5M-4.5 3.5a7 7 0 1 1 9 0c-1 1-1.3 1.6-1.3 2.5h-6.4c0-.9-.3-1.5-1.3-2.5z', fill: '#E5E7EB', stroke: '#9AA6B2', 'stroke-width': 1.2, 'stroke-linejoin': 'round'}, bulb);
     const money = Array.from({length: 6}, (_, i) => {
-      const g = el('g', {transform: `translate(${[96, 150, 108, 142, 84, 160][i]} ${[200, 196, 176, 214, 226, 228][i]})`, opacity: 0}, scene);
+      const pos = el('g', {transform: `translate(${[96, 150, 108, 142, 84, 160][i]} ${[200, 196, 176, 214, 226, 228][i]})`}, scene);
+      const g = el('g', {opacity: 0}, pos);
       el('circle', {r: 7, fill: i % 2 ? C.amber : C.green}, g);
       txt(i % 3 === 1 ? '$' : '₨', {y: 3, 'text-anchor': 'middle', 'font-family': SANS, 'font-weight': 700, 'font-size': 8, fill: '#fff'}, g);
       return g;
     });
 
     // approval card above the plant
-    const card = el('g', {transform: 'translate(372 92)', opacity: 0}, scene);
+    const cardPos = el('g', {transform: 'translate(372 92)'}, scene);
+    const card = el('g', {opacity: 0}, cardPos);
     el('rect', {x: -40, y: -24, width: 80, height: 48, rx: 6, fill: '#fff', stroke: '#D5DEDA'}, card);
     const cb = el('g', {transform: 'translate(-27 -11)'}, card); icon('bulb', cb, C.amber);
     el('rect', {x: -16, y: -14, width: 46, height: 4, rx: 2, fill: '#CBD5E1'}, card);
