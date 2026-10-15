@@ -616,9 +616,8 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
   <h3 class="grp">Digital tools · Microsoft Power Platform</h3>
   <div class="proj two">
     <article class="card">
-      <div class="ph" role="img" aria-label="Image placeholder — image coming soon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
-        <span>Image coming soon</span>
+      <div class="ph-flow ph-idea" role="img" aria-label="Animation: an engineer has an idea, scans a QR code, submits it in the Idea Portal and the idea is approved">
+        <svg viewBox="0 0 520 325" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
       </div>
       <div class="pad">
         <div class="num">PRJ-04 · Power Apps</div>
@@ -628,7 +627,7 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
       </div>
     </article>
     <article class="card">
-      <div class="ph-flow" role="img" aria-label="Animated flow: Project Schedule, Project_Tasks.xlsx, Recurrence, For each candidate, Filter Prior Sends, Digest Mode, Reminder Log">
+      <div class="ph-flow ph-auto" role="img" aria-label="Animated flow: Project Schedule, Project_Tasks.xlsx, Recurrence, For each candidate, Filter Prior Sends, Digest Mode, Reminder Log">
         <svg class="flow-anim" viewBox="0 0 520 325" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
       </div>
       <div class="pad">
@@ -1179,7 +1178,7 @@ document.addEventListener('click', e => {
 
 /* ---------- PRJ-05 Project Tracker Automation: title → flow builds → system runs → delivery ---------- */
 (function(){
-  const box = document.querySelector('.ph-flow');
+  const box = document.querySelector('.ph-auto');
   if (!box) return;
   const svg = box.querySelector('svg');
   const NS = 'http://www.w3.org/2000/svg';
@@ -1207,11 +1206,11 @@ document.addEventListener('click', e => {
   const LAYOUT = {
     wide: {W: 520, H: 325, rows: true,
       pos: [[84, 62], [262, 72], [446, 62], [398, 152], [150, 162], [144, 252], [384, 242]],
-      title: {size: 34, lines: [['Automated', 'Deadline', 'Reminders']], y: [176]},
+      title: {size: 34, lines: [['Automated', 'Project', 'Tracking']], y: [176]},
       mon: {x: 260, y: 122, s: .36}, av: [[78, 150], [442, 150], [110, 268]]},
     narrow: {W: 300, H: 470, rows: false,
       pos: [[108, 50], [192, 112], [108, 174], [192, 236], [108, 298], [192, 360], [108, 422]],
-      title: {size: 38, lines: [['Automated'], ['Deadline'], ['Reminders']], y: [196, 240, 284]},
+      title: {size: 38, lines: [['Automated'], ['Project'], ['Tracking']], y: [196, 240, 284]},
       mon: {x: 150, y: 160, s: .42}, av: [[50, 352], [250, 352], [150, 428]]}
   };
 
@@ -1525,6 +1524,391 @@ document.addEventListener('click', e => {
     document.fonts.ready.then(() => {
       if (cancelled) return;
       tl = sequence(); // primed on the dark cover until it scrolls into view
+      ScrollTrigger.create({trigger: box, start: '40% bottom', once: true, onEnter: () => { if (!started) start(); }});
+      ScrollTrigger.create({trigger: box, start: 'top bottom', end: 'bottom top', onToggle: self => {
+        visible = self.isActive;
+        if (started) visible ? tl.resume() : tl.pause();
+      }});
+    });
+    let rt;
+    const onResize = () => { clearTimeout(rt); rt = setTimeout(() => {
+      const m = box.clientWidth < 420 ? 'narrow' : 'wide';
+      if (m !== mode) { if (started) start(); else { if (tl) tl.kill(); tl = sequence(); } }
+    }, 150); };
+    addEventListener('resize', onResize);
+    return () => { cancelled = true; removeEventListener('resize', onResize); if (tl) tl.kill(); tl = null; started = false; showStatic(); };
+  });
+})();
+
+/* ---------- PRJ-04 CI Idea Portal: title → the spark → scan to submit → the portal → approved ---------- */
+(function(){
+  const box = document.querySelector('.ph-idea');
+  if (!box) return;
+  const svg = box.querySelector('svg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const C = {navy: '#0F1E28', ink2: '#16303F', green: '#0E9F6E', greenDk: '#0A7350', greenLt: '#12B07B', mint: '#3CCB9A',
+    amber: '#F5A524', skin: '#D9A27A', canvas: '#F3F7F5', steel: '#8FA6B2', blue: '#1F6FEB', pnavy: '#0B1F3A'};
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  };
+  const txt = (s, attrs, parent) => { const t = el('text', attrs, parent); t.textContent = s; return t; };
+  const SPARK = 'M0 -5C.8 -.8 .8 -.8 5 0C.8 .8 .8 .8 0 5C-.8 .8 -.8 .8 -5 0C-.8 -.8 -.8 -.8 0 -5Z';
+  const SANS = 'IBM Plex Sans, sans-serif';
+  const FIELDS = [
+    {t: 'Idea Title', bg: '#E8F1FE', tile: '#2F6FDB', icon: 'bulb', bars: [.7]},
+    {t: 'Existing Conditions', bg: '#FFF1E6', tile: '#E8833A', icon: 'warn', bars: [.85, .55]},
+    {t: 'Potential Saving (PKR)', bg: '#E7F7EE', tile: '#1E9E5A', icon: 'coin', bars: [.45], rupee: true},
+    {t: 'Department', bg: '#F0EBFE', tile: '#7A5AF8', icon: 'people', bars: [.5]}
+  ];
+  const LAYOUT = {
+    wide: {W: 520, H: 325, fs: 1, scene: {x: 0, y: 0, s: 1}, sidebar: true,
+      title: {size: 40, lines: [['Every', 'idea', 'matters.']], y: [182]}},
+    narrow: {W: 340, H: 420, fs: 1.15, scene: {x: 0, y: 104, s: 340 / 520}, sidebar: false,
+      title: {size: 44, lines: [['Every', 'idea'], ['matters.']], y: [196, 246]}}
+  };
+  let mode = null, L = null, tl = null, started = false, visible = true;
+
+  // small line icons used in the portal
+  const icon = (kind, parent, col) => {
+    const a = {fill: 'none', stroke: col, 'stroke-width': 1.3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'};
+    if (kind === 'bulb') el('path', Object.assign({d: 'M-2.5 4h5M-2 6h4M-3.5 2.5a5 5 0 1 1 7 0c-.8.8-1 1.3-1 2h-5c0-.7-.2-1.2-1-2z'}, a), parent);
+    if (kind === 'warn') el('path', Object.assign({d: 'M0 -5L5.5 4.5h-11z M0 -1.5v2.5 M0 2.8v.2'}, a), parent);
+    if (kind === 'coin') { el('circle', Object.assign({r: 5}, a), parent); el('path', Object.assign({d: 'M-1.5 -2.5h3M-1.5 0h3M0 -2.5v5'}, a), parent); }
+    if (kind === 'people') el('path', Object.assign({d: 'M-3 -1.5a2 2 0 1 0 0.01 0 M2.5 -2.5a1.7 1.7 0 1 0 0.01 0 M-6.5 5a3.5 3.5 0 0 1 7 0 M0.5 4a3 3 0 0 1 5.5 -1.5'}, a), parent);
+    if (kind === 'home') el('path', Object.assign({d: 'M-5 0L0 -4.5 5 0 M-3.5 -1v5h7v-5'}, a), parent);
+    if (kind === 'person') el('path', Object.assign({d: 'M0 -2.5a2 2 0 1 0 0.01 0 M-4 4.5a4 4 0 0 1 8 0'}, a), parent);
+    if (kind === 'check') { el('circle', Object.assign({r: 5}, a), parent); el('path', Object.assign({d: 'M-2.2 0l1.6 1.6 2.8-3'}, a), parent); }
+    if (kind === 'doc') el('path', Object.assign({d: 'M-3.5 -5h5l2.5 2.5v7.5h-7.5z M-1.5 0h3 M-1.5 2.5h3'}, a), parent);
+    if (kind === 'gear') { el('circle', Object.assign({r: 2}, a), parent); el('path', Object.assign({d: 'M0 -5.5v2M0 3.5v2M-5.5 0h2M3.5 0h2M-3.9 -3.9l1.4 1.4M2.5 2.5l1.4 1.4M-3.9 3.9l1.4 -1.4M2.5 -2.5l1.4 -1.4'}, a), parent); }
+  };
+
+  function build(){
+    mode = box.clientWidth < 420 ? 'narrow' : 'wide';
+    L = LAYOUT[mode];
+    const {W, H, fs} = L;
+    svg.textContent = '';
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    box.style.aspectRatio = `${W} / ${H}`;
+    const defs = el('defs', {});
+    const gA = el('radialGradient', {id: 'ip-glowA'}, defs);
+    el('stop', {offset: 0, 'stop-color': '#FFE29A', 'stop-opacity': 1}, gA);
+    el('stop', {offset: 1, 'stop-color': C.amber, 'stop-opacity': 0}, gA);
+    const gG = el('radialGradient', {id: 'ip-glowG'}, defs);
+    el('stop', {offset: 0, 'stop-color': '#B9F7DE', 'stop-opacity': 1}, gG);
+    el('stop', {offset: 1, 'stop-color': C.green, 'stop-opacity': 0}, gG);
+    const pat = el('pattern', {id: 'ip-dots', width: 14, height: 14, patternUnits: 'userSpaceOnUse'}, defs);
+    el('circle', {cx: 2, cy: 2, r: 1, fill: '#D3DDD9'}, pat);
+
+    // ---- plant view (scenes 2, 3, 5), inside a camera group that can zoom into the phone ----
+    const cam = el('g', {});
+    el('rect', {width: W, height: H, fill: C.canvas}, cam);
+    el('rect', {width: W, height: H, fill: 'url(#ip-dots)'}, cam);
+    const sc = L.scene, scene = el('g', {transform: `translate(${sc.x} ${sc.y}) scale(${sc.s})`}, cam);
+    const GY = 272;
+    el('path', {d: `M0 ${GY}H520`, stroke: '#C5D2CD', 'stroke-width': 1.5}, scene);
+    // plant skyline: column, tanks, stack, pipe rack (line art)
+    const plant = el('g', {fill: '#E6EEEB', stroke: C.steel, 'stroke-width': 1.6, 'stroke-linejoin': 'round'}, scene);
+    el('path', {d: `M300 ${GY}V128a11 9 0 0 1 22 0V${GY}`}, plant);
+    el('path', {d: 'M300 160h22M300 195h22M300 230h22', fill: 'none'}, plant);
+    el('rect', {x: 340, y: 205, width: 52, height: GY - 205, rx: 6}, plant);
+    el('path', {d: 'M340 216h52', fill: 'none'}, plant);
+    el('rect', {x: 404, y: 222, width: 34, height: GY - 222, rx: 5}, plant);
+    el('path', {d: `M455 ${GY}V140h12V${GY}`}, plant);
+    el('path', {d: `M236 232H300M236 244H300M244 232V${GY}M268 232V${GY}M292 232V${GY}M392 240H404M438 250H455`, fill: 'none'}, plant);
+    const pipeBase = el('path', {d: 'M322 180H366V205', fill: 'none', stroke: C.steel, 'stroke-width': 3, 'stroke-linecap': 'round'}, scene);
+    const pipeLit = el('path', {d: 'M322 180H366V205', fill: 'none', stroke: C.green, 'stroke-width': 3.4, 'stroke-linecap': 'round', opacity: 0}, scene);
+    const pipeGlow = el('circle', {r: 8, fill: 'url(#ip-glowG)', opacity: 0}, scene);
+    const steam = [0, 1, 2].map(() => el('circle', {cx: 461, cy: 134, r: 4, fill: '#fff', stroke: '#CFDAD6', 'stroke-width': 1, opacity: 0}, scene));
+
+    // QR poster on a pillar
+    const qr = el('g', {opacity: 0}, scene);
+    el('rect', {x: 200, y: 140, width: 9, height: GY - 140, fill: '#CBD5D1'}, qr);
+    el('rect', {x: 182, y: 156, width: 44, height: 52, rx: 3, fill: '#fff', stroke: '#9FB2AA', 'stroke-width': 1.2}, qr);
+    const Q = {x: 190, y: 164, s: 28}, m = Q.s / 7;
+    for (let r = 0; r < 7; r++) for (let c = 0; c < 7; c++) {
+      const finder = (r < 3 && c < 3) || (r < 3 && c > 3) || (r > 3 && c < 3);
+      if (!finder && ((r * 3 + c * 5 + r * c) % 3 === 0)) el('rect', {x: Q.x + c * m, y: Q.y + r * m, width: m, height: m, fill: C.navy}, qr);
+    }
+    const finders = [[0, 0], [4, 0], [0, 4]].map(([c, r]) => el('rect', {x: Q.x + c * m + .6, y: Q.y + r * m + .6, width: 3 * m - 1.2, height: 3 * m - 1.2, fill: 'none', stroke: C.navy, 'stroke-width': 1.6}, qr));
+    const scanLine = el('rect', {x: Q.x - 3, y: Q.y, width: Q.s + 6, height: 1.6, fill: C.green, opacity: 0}, qr);
+
+    // the engineer (side view, no face): 13 simple shapes, feet at (120, GY)
+    const eng = el('g', {transform: `translate(120 ${GY})`}, scene);
+    const body = el('g', {}, eng);
+    const backArm = el('g', {transform: 'translate(-2 -62)'}, body);
+    el('rect', {x: -4, y: 0, width: 8, height: 30, rx: 4, fill: C.greenDk}, backArm);
+    el('rect', {x: -9, y: -36, width: 9, height: 36, rx: 3, fill: C.ink2}, body);
+    el('rect', {x: 1, y: -36, width: 9, height: 36, rx: 3, fill: '#1E3A4C'}, body);
+    el('rect', {x: -11, y: -68, width: 22, height: 36, rx: 8, fill: C.green}, body);
+    el('rect', {x: -11, y: -39, width: 22, height: 3, fill: C.greenDk}, body);
+    const head = el('g', {transform: 'translate(2 -78)'}, body);
+    el('circle', {r: 9, fill: C.skin}, head);
+    el('path', {d: 'M-11 -2a11 10 0 0 1 22 0z', fill: C.amber}, head);
+    el('rect', {x: -12, y: -3.5, width: 29, height: 4, rx: 2, fill: '#E39410'}, head);
+    const medal = el('path', {d: 'M0 -5l1.5 3.2 3.5 .4-2.6 2.4.7 3.5L0 2.8-3.1 4.5l.7-3.5L-5 -1.4l3.5-.4z', fill: C.amber, stroke: '#fff', 'stroke-width': .8, transform: 'translate(5 -55)', opacity: 0}, body);
+    const arm = el('g', {transform: 'translate(4 -62)'}, body);
+    el('rect', {x: -4, y: 0, width: 8, height: 30, rx: 4, fill: C.greenLt}, arm);
+    el('circle', {cx: 0, cy: 31, r: 4, fill: C.skin}, arm);
+    const phone = el('g', {opacity: 0}, arm);
+    el('rect', {x: -1, y: 26, width: 9, height: 14, rx: 1.6, fill: C.navy}, phone);
+    const screen = el('rect', {x: 0, y: 27.3, width: 7, height: 11.4, rx: .8, fill: '#33475B'}, phone);
+
+    // thought bubbles, the idea bulb, rays, money
+    const bub = [[140, 176, 3], [151, 160, 5.5], [174, 128, 19]].map(([x, y, r]) => el('circle', {cx: x, cy: y, r, fill: '#fff', stroke: '#B8C7C1', 'stroke-width': 1.2, opacity: 0}, scene));
+    const bulb = el('g', {transform: 'translate(174 128)', opacity: 0}, scene);
+    const bulbGlow = el('circle', {r: 20, fill: 'url(#ip-glowA)', opacity: 0}, bulb);
+    const rays = el('g', {opacity: 0}, bulb);
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; el('path', {d: `M${Math.cos(a) * 12} ${Math.sin(a) * 12}L${Math.cos(a) * 17} ${Math.sin(a) * 17}`, stroke: C.amber, 'stroke-width': 1.6, 'stroke-linecap': 'round'}, rays); }
+    const glass = el('path', {d: 'M-3 6h6M-2.5 8.5h5M-4.5 3.5a7 7 0 1 1 9 0c-1 1-1.3 1.6-1.3 2.5h-6.4c0-.9-.3-1.5-1.3-2.5z', fill: '#E5E7EB', stroke: '#9AA6B2', 'stroke-width': 1.2, 'stroke-linejoin': 'round'}, bulb);
+    const money = Array.from({length: 6}, (_, i) => {
+      const g = el('g', {transform: `translate(${[96, 150, 108, 142, 84, 160][i]} ${[200, 196, 176, 214, 226, 228][i]})`, opacity: 0}, scene);
+      el('circle', {r: 7, fill: i % 2 ? C.amber : C.green}, g);
+      txt(i % 3 === 1 ? '$' : '₨', {y: 3, 'text-anchor': 'middle', 'font-family': SANS, 'font-weight': 700, 'font-size': 8, fill: '#fff'}, g);
+      return g;
+    });
+
+    // approval card above the plant
+    const card = el('g', {transform: 'translate(372 92)', opacity: 0}, scene);
+    el('rect', {x: -40, y: -24, width: 80, height: 48, rx: 6, fill: '#fff', stroke: '#D5DEDA'}, card);
+    const cb = el('g', {transform: 'translate(-27 -11)'}, card); icon('bulb', cb, C.amber);
+    el('rect', {x: -16, y: -14, width: 46, height: 4, rx: 2, fill: '#CBD5E1'}, card);
+    el('rect', {x: -16, y: -7, width: 32, height: 4, rx: 2, fill: '#E2E8F0'}, card);
+    const stamp = el('g', {transform: 'translate(0 10) rotate(-10)', opacity: 0}, card);
+    el('rect', {x: -32, y: -10, width: 64, height: 20, rx: 4, fill: 'rgba(22,163,74,.08)', stroke: '#16A34A', 'stroke-width': 2}, stamp);
+    txt('Approved', {y: 4.5, 'text-anchor': 'middle', 'font-family': SANS, 'font-weight': 700, 'font-size': 12, fill: '#16A34A', 'letter-spacing': .5}, stamp);
+    const sparks = Array.from({length: 8}, () => el('path', {d: SPARK, fill: C.amber, opacity: 0}, scene));
+    const confetti = Array.from({length: 20}, (_, i) => el('rect', {x: -2, y: -3.5, width: 4, height: 7, rx: 1, fill: i % 2 ? C.green : C.amber, opacity: 0}, scene));
+
+    // ---- Scene 4: the portal (stylised; no logo, no names) ----
+    const portal = el('g', {});
+    el('rect', {width: W, height: H, fill: '#F1F3F6'}, portal);
+    el('rect', {width: W, height: 34, fill: C.pnavy}, portal);
+    const hb = el('g', {transform: 'translate(17 17)'}, portal);
+    el('circle', {r: 10, fill: '#1B3560'}, hb); icon('bulb', hb, '#FFD27A');
+    txt('Continuous Improvement', {x: 33, y: 15, 'font-family': SANS, 'font-weight': 700, 'font-size': 10 * fs, fill: '#fff'}, portal);
+    txt('Idea Portal', {x: 33, y: 27, 'font-family': SANS, 'font-size': 8 * fs, fill: '#9DB8D9'}, portal);
+    let px = 12;
+    if (L.sidebar) {
+      el('rect', {x: 0, y: 34, width: 88, height: H - 34, fill: '#fff'}, portal);
+      el('path', {d: `M88 34V${H}`, stroke: '#E3E7EE'}, portal);
+      el('rect', {x: 9, y: 46, width: 70, height: 20, rx: 4, fill: C.blue}, portal);
+      txt('+ New Record', {x: 44, y: 59, 'text-anchor': 'middle', 'font-family': SANS, 'font-weight': 600, 'font-size': 8.5, fill: '#fff'}, portal);
+      ['home', 'person', 'check', 'doc', 'gear'].forEach((k, i) => { const g = el('g', {transform: `translate(22 ${86 + i * 24})`}, portal); icon(k, g, '#64748B'); el('rect', {x: 10, y: -2, width: 34, height: 4, rx: 2, fill: '#EEF1F5'}, g); });
+      px = 100;
+    }
+    const pw = W - px - 12, py = 44;
+    el('rect', {x: px, y: py, width: pw, height: H - py - 10, rx: 8, fill: '#fff', stroke: '#E3E7EE'}, portal);
+    const ht = el('g', {transform: `translate(${px + 20} ${py + 20})`}, portal);
+    el('rect', {x: -10, y: -10, width: 20, height: 20, rx: 5, fill: '#FFF4D6'}, ht); icon('bulb', ht, '#D98A00');
+    txt('New Idea', {x: px + 36, y: py + 24, 'font-family': SANS, 'font-weight': 700, 'font-size': 12 * fs, fill: C.pnavy}, portal);
+    const submit = el('g', {transform: `translate(${px + pw - 36} ${py + 20})`}, portal);
+    const subIn = el('g', {}, submit);
+    el('rect', {x: -26, y: -10, width: 52, height: 20, rx: 4, fill: C.blue}, subIn);
+    txt('Submit', {y: 3.5, 'text-anchor': 'middle', 'font-family': SANS, 'font-weight': 600, 'font-size': 9 * fs, fill: '#fff'}, subIn);
+    const cols = L.sidebar ? 2 : 1, gap = 10, cw = (pw - 24 - gap * (cols - 1)) / cols, chh = L.sidebar ? 66 : 64, cy0 = py + 42;
+    const cards = FIELDS.map((f, i) => {
+      const cx = px + 12 + (i % cols) * (cw + gap), cyy = cy0 + Math.floor(i / cols) * (chh + gap);
+      const g = el('g', {transform: `translate(${cx} ${cyy})`}, portal);
+      const inner = el('g', {}, g);
+      el('rect', {width: cw, height: chh, rx: 7, fill: f.bg}, inner);
+      const tg = el('g', {transform: 'translate(16 16)'}, inner);
+      el('rect', {x: -9, y: -9, width: 18, height: 18, rx: 4.5, fill: f.tile}, tg); icon(f.icon, tg, '#fff');
+      txt(f.t, {x: 31, y: 19.5, 'font-family': SANS, 'font-weight': 600, 'font-size': 9.5 * fs, fill: '#334155'}, inner);
+      const ih = f.bars.length > 1 ? 26 : 20, iy = chh - ih - 8;
+      el('rect', {x: 8, y: iy, width: cw - 16, height: ih, rx: 4, fill: '#fff', stroke: '#E2E8F0'}, inner);
+      const x0 = f.rupee ? 22 : 14, bw = cw - 16 - (x0 - 8) - 12;
+      let rupee = null;
+      if (f.rupee) rupee = txt('₨', {x: 15, y: iy + ih / 2 + 3.5, 'text-anchor': 'middle', 'font-family': SANS, 'font-weight': 700, 'font-size': 9, fill: '#1E9E5A'}, inner);
+      const bars = f.bars.map((frac, k) => el('rect', {x: x0, y: iy + 6 + k * 8, width: bw * frac, height: 4, rx: 2, fill: '#CBD5E1'}, inner));
+      const last = f.bars.length - 1;
+      const cursor = el('rect', {x: x0 + bw * f.bars[last] + 2, y: iy + 4 + last * 8, width: 1.2, height: 8, fill: '#475569', opacity: 0}, inner);
+      return {g, inner, bars, cursor, rupee, x0, bw, f};
+    });
+    const pointer = el('path', {d: 'M0 0l0 13 3.5-3.2 2.4 5.2 2.3-1-2.4-5.1 4.8-.3z', fill: '#fff', stroke: C.navy, 'stroke-width': 1.1, 'stroke-linejoin': 'round', opacity: 0}, portal);
+    const plane = el('path', {d: 'M-8 2L9 -6 3 8 1 3z M1 3L9 -6', fill: '#fff', stroke: C.blue, 'stroke-width': 1.2, 'stroke-linejoin': 'round', opacity: 0}, portal);
+    const pSparks = Array.from({length: 3}, () => el('path', {d: SPARK, fill: C.amber, opacity: 0}, portal));
+
+    // ---- Scene 1: dark cover + title with three reacting icons ----
+    const cover = el('rect', {width: W, height: H, fill: C.navy, opacity: 0});
+    const title = el('g', {opacity: 0});
+    const words = [], T = L.title;
+    T.lines.forEach((line, li) => {
+      const ts = line.map(w => txt(w, {y: T.y[li], 'font-family': 'Big Shoulders Display, sans-serif', 'font-weight': 800, 'font-size': T.size, fill: '#fff', 'letter-spacing': .5}, title));
+      const gp = T.size * .28, ws = ts.map(t => t.getComputedTextLength());
+      let x = W / 2 - (ws.reduce((a, b) => a + b, 0) + gp * (ts.length - 1)) / 2;
+      ts.forEach((t, k) => { t.setAttribute('x', x); words.push({x: x + ws[k] / 2, y: T.y[li]}); x += ws[k] + gp; });
+    });
+    const titleCY = (T.y[0] + T.y[T.y.length - 1]) / 2 - T.size * .35;
+    const iconAt = wd => el('g', {transform: `translate(${wd.x} ${wd.y - T.size * .78 - 14})`}, title);
+    const brain = iconAt(words[0]), hat = iconAt(words[1]), tbulb = iconAt(words[2]);
+    const st = {fill: 'none', stroke: C.mint, 'stroke-width': 1.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'};
+    const brainIn = el('g', {}, brain);
+    el('path', Object.assign({d: 'M0 -8v16M0 -8c-3-2-8 0-7 4-3 1-3 6 0 7 0 3 4 5 7 3M0 -8c3-2 8 0 7 4 3 1 3 6 0 7 0 3-4 5-7 3M-4 -1h2M2 2h2'}, st), brainIn);
+    const thoughts = el('path', Object.assign({d: 'M-12 -10l-3 -3M12 -10l3 -3M0 -12v-4', opacity: 0}, st), brain);
+    const hatIn = el('g', {}, hat);
+    el('path', {d: 'M-9 3a9 9 0 0 1 18 0z', fill: 'none', stroke: C.amber, 'stroke-width': 1.6, 'stroke-linejoin': 'round'}, hatIn);
+    el('path', {d: 'M-12 3h24M0 -6v3', stroke: C.amber, 'stroke-width': 1.6, 'stroke-linecap': 'round'}, hatIn);
+    const tGlow = el('circle', {r: 15, fill: 'url(#ip-glowA)', opacity: 0}, tbulb);
+    const tbulbIn = el('g', {}, tbulb);
+    const tGlass = el('path', {d: 'M-3 6h6M-2.5 8.5h5M-4.5 3.5a7 7 0 1 1 9 0c-1 1-1.3 1.6-1.3 2.5h-6.4c0-.9-.3-1.5-1.3-2.5z', fill: 'none', stroke: C.mint, 'stroke-width': 1.6, 'stroke-linejoin': 'round'}, tbulbIn);
+    const tSparks = [[-.42, -1.3], [.46, -1.15], [.36, .5]].map(([fx, fy]) => {
+      const s = el('path', {d: SPARK, fill: C.amber, opacity: 0}, title);
+      s.setAttribute('transform', `translate(${W / 2 + fx * W * .8} ${titleCY + fy * T.size})`);
+      return s;
+    });
+
+    return {cam, scene, eng, body, arm, backArm, head, phone, screen, medal, qr, finders, scanLine, Q, bub, bulb, bulbGlow, rays, glass, money,
+      card, stamp, sparks, confetti, pipeLit, pipeGlow, steam, portal, cards, submit, subIn, pointer, plane, pSparks,
+      cover, title, titleCY, brainIn, thoughts, hatIn, tGlow, tbulbIn, tGlass, tSparks};
+  }
+
+  function showStatic(){ build(); } // the portal with the four cards filled sits on top by default
+
+  function sequence(){
+    const S = build(), {W, H} = L;
+    const t = gsap.timeline({paused: true, onComplete: () => start()});
+    const sp = (s, x, y, at, size = 1) => t.fromTo(s, {x, y, scale: 0, rotation: 0, opacity: 0, transformOrigin: '50% 50%'},
+      {scale: size, rotation: 90, opacity: 1, duration: .22, ease: 'power2.out', immediateRender: false}, at)
+      .to(s, {scale: 0, opacity: 0, duration: .22, ease: 'power2.in'}, at + .22);
+    const ARM = '4px 0px'; // shoulder pivot
+
+    // initial state
+    gsap.set(S.cover, {opacity: 1});
+    gsap.set(S.title, {opacity: 0, scale: .35, filter: 'blur(6px)', svgOrigin: `${W / 2} ${S.titleCY}`});
+    gsap.set([S.brainIn, S.hatIn, S.tbulbIn], {scale: 0, opacity: 0, transformOrigin: '50% 50%'});
+    gsap.set(S.portal, {opacity: 0});
+    gsap.set(S.cards.map(c => c.inner), {scale: .85, opacity: 0, transformOrigin: '50% 50%'});
+    S.cards.forEach(c => gsap.set(c.bars, {scaleX: 0, transformOrigin: '0% 50%'}));
+    gsap.set(S.eng, {opacity: 0});
+
+    // Scene 1 — "Every idea matters." zooms in; brain, hard hat and bulb snap onto the words
+    t.to(S.title, {opacity: 1, scale: 1, filter: 'blur(0px)', duration: .8, ease: 'expo.out'}, .05);
+    [S.brainIn, S.hatIn, S.tbulbIn].forEach((ic, k) => t.fromTo(ic, {scale: 0, opacity: 0, y: -8}, {scale: 1, opacity: 1, y: 0, duration: .25, ease: 'back.out(3)', immediateRender: false}, .45 + k * .12));
+    t.fromTo(S.thoughts, {opacity: 0}, {opacity: 1, duration: .1, yoyo: true, repeat: 3, immediateRender: false}, .72)
+      .to(S.hatIn, {keyframes: {y: [0, -5, 0, -2.5, 0]}, duration: .45, ease: 'sine.inOut'}, .82)
+      .to(S.tGlow, {keyframes: {opacity: [0, .9, .2, 1, .7]}, duration: .45}, .95)
+      .to(S.tGlass, {attr: {stroke: C.amber}, duration: .1}, .95);
+    S.tSparks.forEach((s, k) => t.fromTo(s, {scale: 0, opacity: 0, transformOrigin: '50% 50%'}, {scale: 1, opacity: 1, rotation: 90, duration: .2, yoyo: true, repeat: 1, immediateRender: false}, .7 + k * .18));
+    t.to(S.title, {scale: 3.2, opacity: 0, duration: .45, ease: 'power2.in'}, 1.4)
+      .to(S.cover, {opacity: 0, duration: .4, ease: 'power1.inOut'}, 1.48);
+
+    // Steam drifting from the stack while the plant is on screen
+    const steamAt = (from, to) => { for (let at = from, i = 0; at < to; at += .55, i++) {
+      const p = S.steam[i % 3];
+      t.fromTo(p, {x: 0, y: 0, scale: .8, opacity: .55}, {x: 6, y: -26, scale: 2, opacity: 0, duration: 1.5, ease: 'sine.out', immediateRender: false}, at);
+    } };
+
+    // Scene 2 — the spark: head tilt, bubbles rise, the bulb switches on, money floats up
+    const S2 = 1.8;
+    steamAt(S2, S2 + 4);
+    t.fromTo(S.eng, {opacity: 0, x: -10}, {opacity: 1, x: 0, duration: .35, immediateRender: false}, S2)
+      .to(S.head, {rotation: 9, duration: .3, ease: 'sine.inOut', transformOrigin: '50% 100%'}, S2 + .3)
+      .to(S.head, {rotation: 0, duration: .3, ease: 'sine.inOut'}, S2 + 1.3);
+    S.bub.forEach((b, k) => t.fromTo(b, {scale: 0, opacity: 0, transformOrigin: '50% 50%'}, {scale: 1, opacity: 1, duration: .25, ease: 'back.out(2.5)', immediateRender: false}, S2 + .5 + k * .18));
+    t.fromTo(S.bulb, {scale: 0, opacity: 0, transformOrigin: '50% 50%'}, {scale: 1, opacity: 1, duration: .25, ease: 'back.out(3)', immediateRender: false}, S2 + 1.05)
+      .to(S.glass, {attr: {fill: '#FFD45C', stroke: '#E39410'}, duration: .08}, S2 + 1.3)
+      .fromTo(S.bulbGlow, {opacity: 0}, {opacity: 1, duration: .15, immediateRender: false}, S2 + 1.3)
+      .fromTo(S.rays, {scale: .4, opacity: 0, transformOrigin: '50% 50%'}, {scale: 1, opacity: 1, duration: .25, ease: 'back.out(2)', immediateRender: false}, S2 + 1.3)
+      // "aha": hand up and a little hop
+      .to(S.arm, {rotation: -165, duration: .25, ease: 'back.out(2)', transformOrigin: ARM}, S2 + 1.32)
+      .to(S.body, {keyframes: {y: [0, -9, 0]}, duration: .35, ease: 'sine.inOut'}, S2 + 1.32)
+      .to(S.arm, {rotation: 0, duration: .3, ease: 'power2.inOut'}, S2 + 2.05);
+    S.money.forEach((g, k) => t.to(g, {keyframes: {y: [0, -16, -34], opacity: [0, 1, 0], scale: [.6, 1, 1]}, duration: .95, ease: 'none', transformOrigin: '50% 50%'}, S2 + 1.45 + k * .1));
+
+    // Scene 3 — scan to submit: QR poster, phone up, scan line sweeps twice, then zoom into the phone
+    const S3 = S2 + 2.45;
+    t.to([...S.bub, S.bulb], {opacity: 0, duration: .25}, S3)
+      .fromTo(S.qr, {opacity: 0, x: 24}, {opacity: 1, x: 0, duration: .35, ease: 'power2.out', immediateRender: false}, S3)
+      .fromTo(S.phone, {opacity: 0}, {opacity: 1, duration: .1, immediateRender: false}, S3 + .2)
+      .to(S.arm, {rotation: -78, duration: .35, ease: 'power2.out', transformOrigin: ARM}, S3 + .2)
+      .fromTo(S.scanLine, {opacity: 0, y: 0}, {opacity: 1, duration: .08, immediateRender: false}, S3 + .55)
+      .to(S.scanLine, {y: S.Q.s - 1.6, duration: .28, ease: 'sine.inOut', yoyo: true, repeat: 1}, S3 + .55)
+      .to(S.scanLine, {opacity: 0, duration: .08}, S3 + 1.12)
+      .to(S.finders, {attr: {stroke: C.amber}, duration: .08, yoyo: true, repeat: 3}, S3 + 1.1)
+      .to(S.screen, {attr: {fill: '#8EC5FF'}, duration: .12}, S3 + 1.15);
+    // camera: measure where the phone screen will be once the arm is raised
+    gsap.set(S.arm, {rotation: -78, transformOrigin: ARM});
+    const bb = S.screen.getBBox(), mtx = S.screen.getCTM(), toV = (x, y) => new DOMPoint(x, y).matrixTransform(mtx);
+    const p0 = toV(bb.x, bb.y), p1 = toV(bb.x + bb.width, bb.y + bb.height);
+    gsap.set(S.arm, {rotation: 0});
+    const pc = {x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2}, sw = Math.abs(p1.x - p0.x), k = (H / Math.abs(p1.y - p0.y)) * 1.15;
+    const Z = S3 + 1.3, ps = sw / W;
+    t.to(S.cam, {x: W / 2 - k * pc.x, y: H / 2 - k * pc.y, scale: k, duration: .75, ease: 'power3.inOut', transformOrigin: '0 0'}, Z)
+      .fromTo(S.portal, {x: pc.x - ps * W / 2, y: pc.y - ps * H / 2, scale: ps, opacity: 0, transformOrigin: '0 0'},
+        {x: 0, y: 0, scale: 1, opacity: 1, duration: .75, ease: 'power3.inOut', immediateRender: false}, Z)
+      .to(S.portal, {opacity: 1, duration: .2}, Z);
+
+    // Scene 4 — the portal: four field cards pop in and type themselves, then Submit
+    const S4 = Z + .75;
+    S.cards.forEach((c, i) => {
+      const at = S4 + .1 + i * .15;
+      t.to(c.inner, {scale: 1, opacity: 1, duration: .3, ease: 'back.out(2)'}, at);
+      c.bars.forEach((b, j) => t.to(b, {scaleX: 1, duration: .5, ease: 'power1.inOut'}, at + .3 + j * .45));
+      const typing = .3 + c.bars.length * .45 + .1;
+      t.fromTo(c.cursor, {opacity: 0}, {opacity: 1, duration: .05, yoyo: true, repeat: 5, repeatDelay: .1, immediateRender: false}, at + .25)
+        .set(c.cursor, {opacity: 0}, at + typing + .5);
+      if (c.rupee) t.to(c.rupee, {keyframes: {scale: [1, 1.35, 1, 1.25, 1]}, duration: .5, transformOrigin: '50% 50%'}, at + .3);
+    });
+    const sb = S.submit.getCTM(), sbx = sb.e, sby = sb.f, T4 = S4 + 1.9;
+    t.fromTo(S.pointer, {x: sbx + 40, y: sby + 70, opacity: 0}, {x: sbx + 4, y: sby + 2, opacity: 1, duration: .45, ease: 'power2.out', immediateRender: false}, T4)
+      .to(S.subIn, {keyframes: {scale: [1, .9, 1]}, duration: .22, transformOrigin: '50% 50%'}, T4 + .45)
+      .to(S.pointer, {opacity: 0, duration: .2}, T4 + .7)
+      .fromTo(S.plane, {x: sbx, y: sby, opacity: 0, rotation: 0}, {opacity: 1, duration: .1, immediateRender: false}, T4 + .55)
+      .to(S.plane, {x: W + 30, y: -30, rotation: -20, duration: .6, ease: 'power2.in'}, T4 + .6);
+    S.pSparks.forEach((s, j) => sp(s, sbx + (W - sbx) * (.25 + j * .2), sby - (sby + 20) * (.25 + j * .2), T4 + .75 + j * .08, .8));
+
+    // Scene 5 — approved and recognised: stamp, plant section lights up, celebration
+    const S5 = T4 + 1.25;
+    t.set(S.cam, {x: 0, y: 0, scale: 1}, S5)
+      .set([...S.bub, S.bulb, S.qr, S.phone], {opacity: 0}, S5)
+      .set(S.arm, {rotation: 0}, S5)
+      .to(S.portal, {opacity: 0, duration: .45, ease: 'power1.inOut'}, S5);
+    steamAt(S5, S5 + 2.6);
+    t.fromTo(S.card, {opacity: 0, y: 10}, {opacity: 1, y: 0, duration: .35, ease: 'power2.out', immediateRender: false}, S5 + .35)
+      .fromTo(S.stamp, {opacity: 0, scale: 2.2, transformOrigin: '50% 50%'}, {opacity: 1, scale: 1, duration: .22, ease: 'power3.in', immediateRender: false}, S5 + .75)
+      .to(S.stamp, {keyframes: {scaleX: [1, 1.12, 1], scaleY: [1, .86, 1]}, duration: .25}, S5 + .97);
+    [[-30, 6], [30, 2], [0, 20]].forEach(([dx, dy], j) => sp(S.sparks[j], 372 + dx, 102 + dy, S5 + .97 + j * .04, .7));
+    const lit = S.pipeLit, LEN = lit.getTotalLength();
+    gsap.set(lit, {strokeDasharray: `${LEN} ${LEN + 10}`, strokeDashoffset: LEN});
+    t.set(lit, {opacity: 1}, S5 + 1.1)
+      .to(lit, {strokeDashoffset: 0, duration: .5, ease: 'power1.inOut'}, S5 + 1.1);
+    const gp = {l: 0};
+    t.fromTo(gp, {l: 0}, {l: LEN, duration: .7, ease: 'none', immediateRender: false, onUpdate: () => { const p = lit.getPointAtLength(gp.l); gsap.set(S.pipeGlow, {x: p.x, y: p.y}); }}, S5 + 1.2)
+      .to(S.pipeGlow, {keyframes: {opacity: [0, 1, 1, 0]}, duration: .8}, S5 + 1.2);
+    // celebration: both arms up, a little jump, star medal, short confetti burst
+    const C5 = S5 + 1.35;
+    t.to([S.arm, S.backArm], {rotation: -170, duration: .25, ease: 'back.out(2)', transformOrigin: ARM}, C5)
+      .to(S.body, {keyframes: {y: [0, -12, 0, -6, 0]}, duration: .6, ease: 'sine.inOut'}, C5)
+      .fromTo(S.medal, {opacity: 0, scale: 0, transformOrigin: '50% 50%'}, {opacity: 1, scale: 1, duration: .3, ease: 'back.out(3)', immediateRender: false}, C5 + .3);
+    sp(S.sparks[3], 125, 205, C5 + .4, .6);
+    S.confetti.forEach((c, i) => {
+      const x = 40 + (i * 37) % 440, r = (i * 53) % 360;
+      const at = C5 + .2 + (i % 5) * .04, dur = .9 + (i % 4) * .07;
+      t.fromTo(c, {x, y: -10, rotation: r}, {y: 150 + (i * 29) % 110, rotation: r + 220, duration: dur, ease: 'power1.in', immediateRender: false}, at)
+        .to(c, {keyframes: {opacity: [0, 1, 1, 0]}, duration: dur}, at);
+    });
+    // hold the celebration, then fade back to the dark cover and loop
+    t.to(S.cover, {opacity: 1, duration: .6, ease: 'power1.inOut'}, C5 + 1.15 + 1);
+    return t;
+  }
+
+  function start(){
+    if (tl) tl.kill();
+    tl = sequence();
+    started = true;
+    if (visible) tl.play();
+  }
+
+  if (!window.gsap || !window.ScrollTrigger) { showStatic(); return; }
+  gsap.matchMedia().add({motion: '(prefers-reduced-motion: no-preference)', reduce: '(prefers-reduced-motion: reduce)'}, ctx => {
+    if (ctx.conditions.reduce) { document.fonts.ready.then(showStatic); return; }
+    let cancelled = false;
+    document.fonts.ready.then(() => {
+      if (cancelled) return;
+      tl = sequence();
       ScrollTrigger.create({trigger: box, start: '40% bottom', once: true, onEnter: () => { if (!started) start(); }});
       ScrollTrigger.create({trigger: box, start: 'top bottom', end: 'bottom top', onToggle: self => {
         visible = self.isActive;
