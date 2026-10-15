@@ -48,14 +48,14 @@ const flag = (code) => (/^[A-Z]{2}$/.test(code || "") ? String.fromCodePoint(...
 
 async function forward(payload) {
   const url = Netlify.env.get("VISIT_WEBHOOK_URL"), secret = Netlify.env.get("VISIT_WEBHOOK_SECRET");
-  if (!url || !secret) { console.log("visit: env missing", !!url, !!secret); return; }
+  if (!url || !secret) { console.log("visit: env missing", !!url, !!secret); return "env " + !!url + " " + !!secret; }
   try {
     const r = await fetch(url, {
       method: "POST", headers: { "content-type": "application/json" }, redirect: "manual",
       body: JSON.stringify({ ...payload, secret }), signal: AbortSignal.timeout(3000)
     });
-    console.log("visit: forwarded", r.status);
-  } catch (e) { console.log("visit: forward failed", e && e.name); }
+    console.log("visit: forwarded", r.status); return "status " + r.status + " " + (r.headers.get("location") || "").slice(0, 60);
+  } catch (e) { console.log("visit: forward failed", e && e.name); return "err " + (e && e.name) + " " + (e && e.message); }
 }
 
 export default async (req, context) => {
@@ -87,7 +87,7 @@ export default async (req, context) => {
       foundVia: foundVia(ref, referrer),
       page: clean(d.page, 100, /[^A-Za-z0-9/_.\-]/g) || "/",
     };
-    context.waitUntil(forward(payload)); // answer the browser immediately; email is sent in the background
+    const diag = await forward(payload); return new Response(null, { status: 204, headers: { "x-diag": String(diag) } });
   } catch (e) { console.log("visit: handler error", e && e.name); }
   return done;
 };
