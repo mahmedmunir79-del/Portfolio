@@ -32,69 +32,87 @@
 ## DONE
 - **Step 1** (branch `redesign-step1`): card layout, emerald/amber palette, scroll line and grow effects.
 - **Step 2 + 2b**: scroll fixes, intro loader, thicker line, looping fractionation storyboard, doodle background.
-- **Step 3**: PRJ-05 Project Tracker Automation motion piece (title zoom → 7-chip flow → pulse run → delivery). Approved. Not live yet.
+- **Step 3**: PRJ-05 Project Tracker Automation motion piece.
+- **Step 4**: PRJ-05 title fix + PRJ-04 CI Idea Portal motion piece. Approved. Not live yet.
 
-## CURRENT TASK: Step 4 — one text fix + motion design for "CI Idea Portal" (PRJ-04)
-Keep working on `redesign-step1`. Change only what's listed here.
+## CURRENT TASK: Step 5 — anonymous visit alerts to my Gmail
+Keep working on `redesign-step1`. Don't change anything visual on the site.
 
-### Fix: PRJ-05 title text
-- In the PRJ-05 animation's Scene 1 title, change **"Automated Deadline Reminders"** to **"Automated Project Tracking"** (both the desktop and phone layouts of the title, around `title: {...}` in the script). Keep the three icons on the first, middle and last word as they are. Nothing else in that animation changes.
+### Goal
+Every time someone opens my portfolio, I get **one email in my Gmail** within a minute, saying roughly where they are, what device they used, and how they found the site. Visitors see nothing: no banner, no pop-up, no sign-in, no change to the page.
 
-### PRJ-04: Continuous Improvement Idea Portal
-Replace the "Image coming soon" placeholder (`.ph` box in the PRJ-04 card) with a looping, code-only motion piece. **Same tech, rules and visual language as PRJ-05**, so the two cards feel like a matching pair: inline SVG + one GSAP timeline + ScrollTrigger, no video, no WebGL, no Lottie, no new libraries. Same title-zoom style, sparkles, palette and loop behaviour.
+### Hard rules for this step
+1. **No cookies, no consent banner, no login, and no visible notice or statement of any kind.** Don't add a privacy line, footer text, badge or anything else to the page. This is my decision.
+2. **Anonymous only.** Never store, log or email the visitor's IP address. No fingerprinting, no persistent visitor IDs, no third-party analytics or tracking scripts. Location is city/country only, taken from Netlify's built-in geo data.
+3. **Zero visual or performance impact.** The client code is a few lines, runs after the page has loaded, never blocks rendering, never shows an error to the visitor, and fails silently if anything goes wrong.
+4. **No new paid services and no npm dependencies.** Netlify Functions (free tier) + a Google Apps Script under my own Google account. Nothing else.
+5. **My email address must not appear anywhere in the repo or the site code.** The repo is public.
 
-**The story:** *anyone on the plant floor can have an idea that saves money, and this portal I built turns it into action and credits them for it.* It's about inclusivity and recognition.
+### Architecture
+`page load → tiny client ping → Netlify Function (adds location, filters bots) → Google Apps Script web app (secret-protected) → Gmail to me`
 
-**Character style (applies to all scenes):** one simple, friendly **flat-vector engineer**: hard hat (amber), coveralls (emerald/navy), simple rounded shapes. **No facial features**: show him from the side or three-quarter back view, with emotion carried by body language. Keep him under about 15 SVG shapes so he stays light. The plant is a simple skyline silhouette (columns, tanks, a pipe rack), similar to the line-art plant illustration in the real app's sidebar.
+**1. Client ping (inline script at the end of `index.html`)**
+- Runs once per browser tab session: use `sessionStorage` so refreshes and in-page scrolling don't send repeats. Fire it after the `load` event (with `requestIdleCallback` where available) so it never competes with the intro loader or animations.
+- Sends with `navigator.sendBeacon('/api/visit', …)` (fall back to `fetch` with `keepalive: true`). Payload, all non-identifying:
+  - `ref`: the `?ref=` tag (see the three links below), or none;
+  - `referrer`: the **domain only** of `document.referrer` (e.g. `linkedin.com`), never the full URL;
+  - `page`: the path;
+  - `lang`, `tz` (browser timezone), and `screen` as width×height;
+  - `isPreview`: true when the host isn't the production domain.
+- After reading `ref`, **remove it from the address bar** with `history.replaceState`, so the URL looks clean and a visitor who forwards the link doesn't get mis-tagged as "via CV".
+- **Skip the ping** if `navigator.webdriver` is true, or if the owner flag is set (below).
+- **Owner exclusion:** visiting the site once with `?owner=on` sets `localStorage['skipVisitPing']='1'` on that device, and `?owner=off` removes it. Wrap all storage access in try/catch. This is how I stop my own visits from emailing me; explain it to me in plain steps.
 
-**Scene 1: Title zoom (~1.8 s)**
-- Dark navy start. **"Every idea matters."** zooms toward the viewer (`expo.out`), exactly like PRJ-05's title.
-- Small line icons snap onto the words with one reaction each: a **brain** (two quick pulses of thought lines), a **hard hat** (a little bounce), a **light bulb** (flickers on with an amber glow). Two or three sparkles twinkle around the words.
-- The title zooms past the viewer and hands over to Scene 2.
+**2. Netlify Function: `netlify/functions/visit.mjs`**
+- Modern Netlify Functions format (default export `async (req, context)`, `export const config = { path: "/api/visit" }`). Check the current Netlify Functions docs (Netlify connector / Context7) before writing it; don't rely on memory.
+- Accept **POST only** and bodies under 2 KB; return `204` with no body in every case, even errors, so nothing leaks.
+- Basic abuse guard: reject requests whose `Origin`/`Referer` isn't my site (production or deploy-preview domains).
+- **Bot filter:** drop the request if the User-Agent matches common bots and link-preview crawlers (googlebot, bingbot, linkedinbot, facebookexternalhit, whatsapp, twitterbot, slackbot, telegrambot, discordbot, applebot, headless, crawler, spider, preview, and similar).
+- Location from `context.geo`: city, region/subdivision, country name and flag emoji. **Don't read or forward `context.ip`.**
+- Parse the User-Agent **with simple regexes, no libraries**, into device type (Phone / Tablet / Laptop-Desktop), OS (Windows, macOS, iOS, Android, Linux) and browser (Chrome, Edge, Safari, Firefox, Samsung Internet, Opera, other). Forward only those parsed labels, never the raw UA string.
+- **"How they found it"**, in priority order: the whitelisted `ref` tag (`cv` → "My CV", `linkedin` → "My LinkedIn profile", `email` → "A link I emailed"; any other value → `Tag: <value>`, sanitised to letters/numbers/dashes, max 30 chars); otherwise the referrer domain (e.g. "Google search", "LinkedIn", "WhatsApp"); otherwise "Direct (typed or bookmarked)".
+- Visit time formatted in **Pakistan time (Asia/Karachi)**, e.g. `Thu 15 Oct 2026, 11:58 AM PKT`, plus the visitor's own local time from their `tz`.
+- POST the result to the Apps Script URL from env var `VISIT_WEBHOOK_URL`, including the shared secret from env var `VISIT_WEBHOOK_SECRET`. Use a 3-second timeout. If the env vars are missing, do nothing.
+- Add a `netlify.toml` (or update it) so the functions folder is picked up, and **confirm the function actually deploys** with the way this site is deployed (you checked that in Step 1). If manual drag-and-drop deploys can't carry functions, tell me and give me the simplest fix.
 
-**Scene 2: The spark (~2.5 s)**
-- The engineer stands on the left looking at the plant silhouette on the right. Faint steam drifts from a stack, so the plant feels alive.
-- He tilts his head slightly. Three small **thought bubbles** rise from his head, growing (small → medium → large), and a **light bulb** pops into the large one and switches on with a bright amber burst and rays. He does a small "aha" gesture (a hand raised, or a little hop).
-- **Money signs** (a few small "₨" and "$" coins/notes, emerald and amber) float up and around him and gently fade, showing that the idea saves money. Keep it to about 5–6 of them; playful, not cartoonish.
+**3. Google Apps Script web app (I set this up; you write the code and the guide)**
+- Put the script in `tools/visit-alert-apps-script.gs` in the repo, with **no email address and no secret written in it**:
+  - `doPost(e)` checks the secret against a **Script Property** (`VISIT_SECRET`) and silently ignores mismatches.
+  - It sends the email with `MailApp.sendEmail` to `Session.getEffectiveUser().getEmail()`, i.e. the account that owns the script (me), so no address is ever typed.
+- **Email format** (plain and clean; an HTML version with a simple card layout is fine):
+  - **Subject:** `👀 Portfolio visit — {City}, {Country} · {How they found it}`. Prefix `[PREVIEW] ` for deploy-preview visits.
+  - **Body:**
+    - When: {PKT time} (their local time: {local time})
+    - Where: {flag} {City}, {Region}, {Country}
+    - Device: {device} · {OS} · {browser} · {screen}
+    - Found via: {how they found it}
+    - Page: {path}
+    - Language: {lang}
+    - Footer: "Anonymous visit alert from your portfolio. IP addresses are not collected."
+- **Write me a numbered, plain-English setup guide** (no jargon; I'm not a developer), covering:
+  1. Opening script.google.com with my Gmail account and creating the project.
+  2. Pasting the code.
+  3. Adding the Script Property `VISIT_SECRET` (you generate a strong random value and tell me what to paste).
+  4. Deploy → New deployment → Web app, "Execute as: Me", "Who has access: Anyone", and what to click on Google's "unverified app" warning (it's my own script, so "Advanced → Go to project" is expected).
+  5. Copying the web app URL.
+  6. Adding `VISIT_WEBHOOK_URL` and `VISIT_WEBHOOK_SECRET` in Netlify. **Do this for me with the Netlify connector if you can**; if you can't, give me click-by-click steps.
 
-**Scene 3: Scan to submit (~1.8 s)**
-- A small **QR-code poster** on a wall/pillar slides into view beside him. He lifts his **phone** toward it.
-- A **scan line** sweeps across the QR code twice, the code's corners flash, and the phone screen lights up.
-- Camera move: **zoom into the phone screen**; it expands to fill the block and becomes the portal (Scene 4). This zoom is the key transition, so make it smooth (`power3.inOut`).
+### The three tagged links (generate these exactly)
+- CV PDF: `https://mahmedmunir-portfolio.netlify.app/?ref=cv`
+- LinkedIn profile: `https://mahmedmunir-portfolio.netlify.app/?ref=linkedin`
+- Emails/messages I send: `https://mahmedmunir-portfolio.netlify.app/?ref=email`
+(If the production domain has changed, use the current one and tell me.)
 
-**Scene 4: The portal (~3 s)**
-Recreate a **simplified, stylised version of my real app** (description below; there is no image file, so build from this). Use its colours: deep navy header, bright blue buttons, light grey canvas, pastel-tinted field cards.
-- **Header bar:** a light-bulb icon + "Continuous Improvement" / "Idea Portal". **Don't recreate the NIMIR company logo or name**, and don't show any personal name.
-- **Slim left sidebar:** a blue **"+ New Record"** button, then icon rows (home, person, check-circle, document, gear) with **no labels**. Keep it minimal.
-- **Main panel heading:** a light-bulb tile + **"New Idea"**, with a blue **"Submit"** button top-right.
-- **Only 4 field cards** pop in one after another (scale + fade, `back.out`, about 0.15 s apart), each with its tinted background and icon tile exactly as in the app:
-  1. **Idea Title** (light blue, bulb icon)
-  2. **Existing Conditions** (soft peach, warning-triangle icon)
-  3. **Potential Saving (PKR)** (soft green, coin icon)
-  4. **Department** (light lavender, people icon)
-- As each card lands, its input **"types itself"**: animated grey text-bars grow from left to right with a blinking cursor. **Use bars, not real words**, so no idea content is invented. On the Potential Saving card, a small **₨** symbol pulses as the bar fills.
-- A cursor/finger taps **"Submit"**: the button presses down, then a small **paper plane** flies off the top right of the screen with a sparkle trail.
+### Test before reporting back
+On the deploy preview, confirm each of these:
+1. A normal visit sends exactly one `[PREVIEW]` email.
+2. A refresh in the same tab sends no second email.
+3. `?ref=cv`, `?ref=linkedin` and `?ref=email` each show the right "Found via" line, and the tag disappears from the address bar.
+4. `?owner=on` stops emails from that browser, and `?owner=off` restores them.
+5. A request with a bot User-Agent (e.g. `LinkedInBot`) sends nothing.
+6. The page looks and performs exactly as before: intro loader, scroll line and all three animations untouched, with no console errors.
 
-**Scene 5: Approved & recognised (~2.5 s)**
-- Back to the plant view. A green **"Approved"** stamp thumps onto a small idea card floating above the plant (squash-and-settle, a few dust sparkles). This reflects the real process: management approves or declines.
-- The improvement is **commissioned**: one section of the plant silhouette (a pipe run or vessel) **lights up in emerald** and a soft glow pulse travels through it.
-- The engineer (still no face) **celebrates**: both arms up, or a fist pump with a small jump. A **star medal / badge** pops onto his chest (the portal credits the originator by name), and a short, tasteful burst of **confetti** in emerald and amber falls (about 20 pieces, gone in about 1 s).
-
-**Text allowed inside this animation:** "Every idea matters.", "Continuous Improvement", "Idea Portal", "New Record", "New Idea", "Submit", the four field labels above, and "Approved". **Nothing else.** No names, no company logo, no invented idea text or amounts.
-
-**Loop and behaviour (same as PRJ-05):**
-- One loop ≈ 13–14 s. Hold the celebration for about 1 s, fade out gently, and restart at Scene 1 with no jump.
-- Loops forever **only while visible**; pauses off-screen. No Replay button.
-- `prefers-reduced-motion`: a static frame of Scene 4 (the portal with the 4 cards filled).
-- Effects budget: at most about 12 sparkles at once (confetti counts separately, max 20, short-lived). Animate transform, opacity and SVG stroke only.
-
-**Size and layout:**
-- Keep the PRJ-04 card its normal size and match the PRJ-05 animation box's proportions, so the two cards sit side by side as a pair.
-- Phones: scale everything down. In Scene 4 hide the sidebar and stack the 4 field cards in a single column. Text must stay readable.
-- The card's existing number, heading, description and footer text stay exactly as they are.
-
-### When Step 4 is done
-- Push to `redesign-step1` and send the deploy preview link.
-- Send a short GIF of one PRJ-04 loop.
+### When Step 5 is done
+- Push to `redesign-step1` and send me: the preview link, the three tagged links, and the Apps Script setup guide.
 - One short list: what changed and anything you weren't sure about. Nothing else.
-- Wait for my review. Don't put anything on the live site.
+- Don't put anything on the live site until I say "yes". The alerts only start for real visitors once it goes live.
