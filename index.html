@@ -1290,6 +1290,7 @@ document.addEventListener('click', e => {
     el('rect', {x: -12, y: -6, width: 24, height: 12, rx: 3, fill: '#5C2D91'}, vba);
     el('text', {x: 0, y: 3, 'text-anchor': 'middle', 'font-family': 'IBM Plex Sans, sans-serif', 'font-size': 7.5, 'font-weight': 700, fill: '#fff'}, vba).textContent = 'VBA';
 
+    const pulseLayer = el('g', {}, world); // pulse runs underneath the chips, visible in the gaps
     const chipLayer = el('g', {}, world);
     const chips = CHIPS.map((c, i) => {
       const [cx, cy] = P[i];
@@ -1306,7 +1307,7 @@ document.addEventListener('click', e => {
       const glow = el('rect', {x: x0 - 2.5, y: -h / 2 - 2.5, width: w + 5, height: h + 5, rx: 9, fill: 'none', stroke: C.mint, 'stroke-width': 2, opacity: 0}, inner);
       const tile = el('g', {transform: `translate(${x0 + 16} 0)`}, inner);
       el('rect', {x: -10, y: -10, width: 20, height: 20, rx: 4.5, fill: c.tile}, tile);
-      const o = {g, inner, glow, tile, x: cx, y: cy, w};
+      const o = {g, inner, glow, tile, tx: x0 + 16, x: cx, y: cy, w};
       if (c.glyph) el('text', {y: c.glyph.length > 1 ? 3 : 4, 'text-anchor': 'middle', 'font-family': 'IBM Plex Sans, sans-serif', 'font-weight': 700, 'font-size': c.glyph.length > 1 ? 8 : 11, fill: '#fff'}, tile).textContent = c.glyph;
       if (c.icon === 'clock') {
         el('circle', {r: 6, fill: 'none', stroke: '#fff', 'stroke-width': 1.4}, tile);
@@ -1335,13 +1336,12 @@ document.addEventListener('click', e => {
     label0800.textContent = '08:00';
 
     // pulse with a short trail, plus the three candidate dots
-    const pulseLayer = el('g', {}, world);
     const trail = [0.35, 0.55, 0.75].map((op, k) => el('circle', {r: 3.2 - k * .6, fill: C.mint, opacity: 0}, pulseLayer));
     const pulse = el('g', {opacity: 0}, pulseLayer);
     el('circle', {r: 9, fill: 'url(#fl-glowG)'}, pulse);
     el('circle', {r: 3.6, fill: '#fff', stroke: C.green, 'stroke-width': 1.5}, pulse);
     const dots = [C.red, C.amber, C.green].map(col => el('circle', {r: 3.4, fill: col, stroke: '#fff', 'stroke-width': 1, opacity: 0}, pulseLayer));
-    const cross = el('path', {d: 'M-3 -3l6 6M3 -3l-6 6', stroke: C.red, 'stroke-width': 1.6, 'stroke-linecap': 'round', opacity: 0}, pulseLayer);
+    const cross = el('path', {d: 'M-3 -3l6 6M3 -3l-6 6', stroke: C.red, 'stroke-width': 1.6, 'stroke-linecap': 'round', opacity: 0}, world);
     const sparkles = Array.from({length: 6}, () => { const s = el('path', {d: SPARK, fill: C.amber, opacity: 0}, world); return s; });
 
     // envelopes for Scene 4 (above the flow)
@@ -1456,7 +1456,7 @@ document.addEventListener('click', e => {
     // Recurrence: hands sweep round to 08:00, a small ring, then the pulse launches with a burst
     t.fromTo(ch[2].min, {rotation: 0}, {rotation: 720, duration: .4, ease: 'power2.inOut', transformOrigin: '50% 100%', immediateRender: false}, k)
       .fromTo(ch[2].hour, {rotation: 120}, {rotation: 240, duration: .4, ease: 'power2.inOut', transformOrigin: '50% 100%', immediateRender: false}, k)
-      .to(ch[2].tile, {keyframes: {x: [0, -1.2, 1.2, -1, 0]}, duration: .2}, k + .4)
+      .to(ch[2].tile, {keyframes: {x: [0, -1.2, 1.2, -1, 0].map(v => ch[2].tx + v)}, duration: .2}, k + .4)
       .fromTo(S.label0800, {opacity: 0, y: 4}, {opacity: 1, y: 0, duration: .2, immediateRender: false}, k + .35);
     S.sparkles.slice(0, 3).forEach((s, j) => sp(s, ch[2].x + [-14, 0, 14][j], ch[2].y + [-12, -20, -12][j], k + .45 + j * .04, .8));
     k += .5;
@@ -1466,14 +1466,15 @@ document.addEventListener('click', e => {
       .to([S.pulse, ...S.trail], {opacity: 0, duration: .12}, k + .05);
     place(S.dots, S.at[3], [-6, 0, 6]);
     t.fromTo(S.dots, {opacity: 0}, {opacity: 1, duration: .12, immediateRender: false}, k + .05);
-    travel(S.dots, S.at[3], S.at[4], SEG + .1, k + .15, [-6, 0, 6]); k += .15 + SEG + .1; light(ch[4], k);
-    // Filter Prior Sends: one candidate was already reminded — it is filtered out with a tiny ✕
-    const fp = S.pt(S.at[4]);
-    gsap.set(S.cross, {x: fp.x, y: fp.y});
-    t.fromTo(S.cross, {opacity: 0, scale: .5, transformOrigin: '50% 50%'}, {opacity: 1, scale: 1, duration: .15, immediateRender: false}, k + .05)
+    // Filter Prior Sends: just before the chip, the candidate that was already reminded is dropped with a tiny ✕
+    const FL = S.at[4] - Math.min(24, (S.at[4] - S.at[3]) * .3), fp = S.pt(FL);
+    travel(S.dots, S.at[3], FL, SEG, k + .15, [-6, 0, 6]); k += .15 + SEG;
+    gsap.set(S.cross, {x: fp.x, y: fp.y - 12});
+    t.fromTo(S.cross, {opacity: 0, scale: .5, transformOrigin: '50% 50%'}, {opacity: 1, scale: 1, duration: .15, immediateRender: false}, k)
       .to(S.dots[1], {opacity: 0, scale: 0, duration: .25, transformOrigin: '50% 50%'}, k + .05)
-      .to(S.cross, {opacity: 0, duration: .2}, k + .35);
-    travel([S.dots[0], S.dots[2]], S.at[4], S.at[5], SEG, k + .2, [-6, 6]); k += .2 + SEG; light(ch[5], k);
+      .to(S.cross, {opacity: 0, duration: .2}, k + .4);
+    travel([S.dots[0], S.dots[2]], FL, S.at[4], .12, k + .3, [-6, 6]); k += .42; light(ch[4], k);
+    travel([S.dots[0], S.dots[2]], S.at[4], S.at[5], SEG, k, [-6, 6]); k += SEG; light(ch[5], k);
     // Digest Mode: the switch flips (TRUE: one daily digest, FALSE: one email per task)
     t.to(ch[5].knob, {attr: {cx: digest ? 12 : 6}, duration: .2, ease: 'power2.out'}, k)
       .to(ch[5].pill, {attr: {fill: digest ? '#2E9E5B' : C.red}, duration: .2}, k);
