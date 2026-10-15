@@ -31,51 +31,71 @@
 
 ## DONE
 - **Step 1** (branch `redesign-step1`): card layout, emerald/amber palette, scroll line and grow effects.
-- **Step 2**: scroll fixes and the fractionation storyboard animation. Approved apart from the tweaks below. Not live yet.
+- **Step 2 + 2b**: scroll fixes, intro loader, thicker line, looping fractionation storyboard, doodle background. Not live yet.
 
-## CURRENT TASK: Step 2b — four tweaks
-Keep working on `redesign-step1`. Change only what's listed here; everything else stays as it is.
+## CURRENT TASK: Step 3 — motion design for "Project Tracker Automation" (PRJ-05)
+Keep working on `redesign-step1`. Replace the "Animation coming soon" placeholder (`.ph` box in the PRJ-05 card) with a looping, code-only motion piece. Change nothing else on the site. **The Power Apps card (CI Idea Portal) keeps its placeholder for now.**
 
-### Tweak 1: intro loading screen (like lusion.co)
-Re-open https://lusion.co/ in Chrome and study **only its opening**: the short loading screen and the way it hands over to the site. Recreate that feel in lightweight code (no WebGL, no video).
+**Reference:** `design-refs/automation-flow-ref.png` is the real flow diagram I made for this automation. Open it and study it. Use **only the middle diagram** (the four stages and their cards). **Ignore its header, the four stat boxes and the footer.** Some characters in the image are garbled by encoding: `Â·` means `·` and `â†'` means `→`.
 
-**Sequence (2.5–3 s total, never longer):**
-1. **Loader (~1.5 s):** full-screen panel in the site's dark navy with a thin emerald progress bar or counter (0 → 100). While it fills, short goofy engineering lines **roll up one after another** (each slides up into view and out, like an odometer or ticker):
-   - "Heating up the reboiler…"
-   - "Establishing reflux…"
-   - "Checking the mass balance…"
-   - "Venting the last bit of steam…"
-2. **Final line (~0.6 s):** the ticker stops on **"Let's blow off some steam together."** in larger text, held briefly.
-3. **Zoom reveal (~0.6 s):** that line **zooms toward the viewer** (scales up and fades) while the panel opens (splits or wipes away), and the portfolio appears behind it with a slight settle from 1.04 to 1.0 scale. The hero then plays its normal entrance.
+**Same tech and rules as the fractionation piece:** inline SVG + one GSAP timeline + ScrollTrigger (already loaded from cdnjs). No video, no WebGL, no Lottie, no new libraries. Check GSAP docs with Context7. Animate transform, opacity and SVG stroke only.
 
-**Rules for the loader:**
-- Show it **once per visit** (use `sessionStorage`). Reloads within the same visit go straight to the site.
-- Any click, tap, scroll or key press **skips** it immediately.
-- Never block the page longer than 3 s, even on slow connections. If assets are still loading, reveal anyway.
-- With `prefers-reduced-motion`: just a quick fade, no rolling or zoom.
-- Use the site's existing fonts and palette. The lines above are the only new text; use them exactly.
+### The story
+*Every morning at 08:00, a system I built reads the project schedule, decides who needs a reminder, emails them and logs it, with nobody touching it.* The viewer should come away thinking: "he designed an automated system end to end."
 
-### Tweak 2: thicker scroll line
-- The flowing scroll line is too thin. Compare it with the line on lusion.co and make it clearly bolder: about **3–4 px on desktop and 2.5–3 px on phones**, with rounded ends.
-- Scale the tip marker dot to match. Keep the current colour, speed and path.
+### Exact text to use (from my diagram; don't add, reword or invent labels)
+- **Title (Scene 1):** "Automated Deadline Reminders"
+- **Stage labels:** 1 PLAN & EXPORT · 2 TRIGGER & READ · 3 DECIDE & DE-DUPLICATE · 4 NOTIFY & LOG
+- **Stage 1:** Project Schedule — MS Project · 129 tasks | ExportTasksToExcel — Macro · one-click sync | Project_Tasks.xlsx — OneDrive · tasks + settings
+- **Stage 2:** Recurrence — Daily · 08:00 | List Settings — Window, recipients | List Tasks — Live schedule | List Log — Already reminded
+- **Stage 3:** Filter Eligible — Open · active · real dates | For each candidate — Overdue · Due today · Due soon (dark card) | Filter Prior Sends — No duplicate reminders
+- **Stage 4:** Digest Mode — Switch · from settings (dark card) → Send Digest [TRUE] — One daily summary email / Send Each Task [FALSE] — Email to each task owner → Add a row · Reminder Log — Every reminder logged · failures retried
+- Icons as in the reference: simple coloured letter tiles (P green, VBA purple, X green for Excel, clock blue, {x} violet, loop icon, envelope blue, switch icon). **Don't use real Microsoft logo artwork**; the letter tiles are enough.
 
-### Tweak 3: fractionation animation loops continuously
-- **Remove the Replay button** completely.
-- The full storyboard sequence (vendors → convergence → erection → commissioning → network) now **loops forever** while the block is on screen: after Scene 5, hold the finished diagram for about 2.5 s, fade the scene out gently, and restart from Scene 1. There must be no jump or flash at the restart.
-- Still **pause when off-screen** and resume when it comes back into view.
-- **Shorten Scene 1 (vendors):** the logos pop in faster (about 0.12 s apart, each pop about 0.35 s) with a short hold of about 0.4 s. The whole scene should take about 1.2 s instead of 2.5 s. Tighten the other holds slightly so one loop runs about 9–10 s.
-- With `prefers-reduced-motion`: show the final diagram, static, with no loop.
+### Scene 1: Title zoom (~1.8 s)
+- The block starts dark navy. "Automated Deadline Reminders" starts small and slightly blurred in the distance and **zooms toward the viewer** to full size (`expo.out`).
+- Three small line icons **snap onto the words** as they land, each with one tiny reaction:
+  - an **alarm clock** on the first word, which rings (a quick shake with two little sound arcs);
+  - a **lightning bolt** (automation/power) near the middle, which flashes once with a brief amber glow;
+  - an **envelope** on the last word, whose flap opens and closes.
+- Two or three small 4-point sparkles twinkle around the title.
+- Transition: the whole title keeps zooming past the viewer (scale up + fade), and the background flips to the light dotted canvas of Scene 2.
 
-### Tweak 4: chemical-engineering doodle background in the fractionation block
-- Replace the plain white/blank background of the `.pfd` block with a **WhatsApp-chat-style doodle pattern**: many small, scattered line icons of chemical-engineering equipment in a P&ID / hand-drawn style:
-  - distillation column, shell-and-tube heat exchanger, centrifugal pump, valve (bow-tie), storage tank, reactor with agitator, cooling tower, flask, pressure gauge, compressor, cyclone, pipe elbow.
-- Draw them as simple thin-stroke SVG icons, varied in size (about 24–40 px) and rotation, spread unevenly so it looks hand-scattered rather than grid-like. Build it as one repeating SVG tile so it's light.
-- Keep it **very faint** (about 6–10% opacity, in the navy or emerald tone) so the column, arrows and logos remain the clear focus and stay readable.
-- **Subtle motion:** the pattern drifts very slowly (one full tile every 40–60 s), and a few icons gently bob or rotate a few degrees. Calm, never busy. Off for `prefers-reduced-motion`; paused when off-screen.
-- This replaces the faint blueprint grid from Step 2. Scene 1 should now fade in the doodle pattern instead.
+### Scene 2: The flow builds (~3 s)
+Recreate the reference diagram's layout: four rows, white cards with a coloured left edge and soft shadow, a dotted-grid background, and the small "+" connector circles on the arrows.
+- **Row by row, left to right:** the stage badge (number circle + label) pops first, then each card **pops in** (scale 0.85→1, slight `back.out`, about 0.12 s apart). Between cards, the **arrow draws itself** and its "+" circle pops when the line passes it.
+- The connector that drops from the end of one row to the start of the next **draws along its full elbow path**, so the eye follows the flow down.
+- Rhythm: 3 cards → 4 cards → 3 cards → the stage 4 branch. Row 4: Digest Mode appears, the line **splits** into the TRUE and FALSE branches, then both **merge** into Reminder Log.
+- The whole build takes about 3 seconds: quick but readable.
 
-### When Step 2b is done
-- Push to `redesign-step1` and send me the deploy preview link.
-- Send a short GIF of the loader and one loop of the fractionation animation.
+### Scene 3: The system runs (~3 s)
+Now show it working. A single **glowing pulse** (a bright emerald dot with a short sparkle trail) travels the whole path from Project Schedule to Reminder Log. As it reaches each card, that card **lights up briefly** (border glow + a small tick on the icon).
+- **Recurrence:** the clock icon's hands sweep round and stop at 08:00, with a small ring. This is the trigger, so the pulse "launches" from here with a little burst.
+- **For each candidate:** its loop icon spins once, and the pulse **splits into three small dots** in red, amber and green (Overdue, Due today, Due soon).
+- **Filter Prior Sends:** one of the three dots is **filtered out** (it fades with a tiny ✕). This visibly shows the de-duplication.
+- **Digest Mode:** the switch icon **flips**, and the pulse takes **one branch**. **Alternate each loop:** TRUE (Send Digest) on one loop, FALSE (Send Each Task) on the next, so both paths get shown over time. The unused branch dims.
+- **Reminder Log:** a "+1" row slides into the Excel tile, with a soft sparkle.
+
+### Scene 4: Delivery (~3 s)
+- The camera **pulls back**: the whole flow diagram shrinks and settles into the **screen of a PC monitor** in the centre of the block. On the monitor's stand or corner sits a small **lightning-bolt automation badge** that pulses: this is the system running by itself.
+- From the monitor, **envelopes fly out** along curved dotted paths to **three generic person avatars** (simple head-and-shoulders circles, no names, no faces) placed around it. The envelopes are staggered and slightly arc-shaped, as if they were thrown.
+- As each envelope lands, its avatar gets a small **notification dot / check mark** and a tiny sparkle burst.
+- On the alternating "digest" loop, send **one** envelope to one avatar instead (one daily summary), so it matches the branch that was taken in Scene 3.
+
+### Loop
+- Hold the delivered state for about 1.2 s, fade the whole scene out gently, and restart at Scene 1. No jump or flash at the restart. **One loop ≈ 11–12 s.**
+- Loops forever **only while visible**; pauses when off-screen and resumes when back. No Replay button.
+- `prefers-reduced-motion`: show the finished Scene 2 diagram, static.
+- Effects budget, to stay light and calm: at most about 12 sparkles on screen at once, one pulse trail, and no continuous background motion beyond a very faint dotted grid.
+
+### Size and layout
+- 13 cards won't be readable in a small card thumbnail. **Make the PRJ-05 card span the full width of the projects grid** on desktop, with the animation box at roughly 16:9 above the existing text. Tell me if this upsets the grid, and suggest an alternative.
+- **Phones:** turn the flow into a **single vertical column** (stage badge, then that stage's cards stacked, arrows pointing down), using the same order and timing. Scene 1 and Scene 4 work as they are, just scaled. Text must stay readable; shorten nothing.
+- Colours: keep the reference's product colours for the icon tiles so they stay recognisable; everything else (pulse, glows, sparkles, title) uses the site's emerald/amber palette.
+- The card's existing number, heading, description and footer text stay exactly as they are.
+
+### When Step 3 is done
+- Push to `redesign-step1` and send the deploy preview link.
+- Send a short GIF covering two loops (so both the TRUE and FALSE branches show).
 - One short list: what changed and anything you weren't sure about. Nothing else.
 - Wait for my review. Don't put anything on the live site.
