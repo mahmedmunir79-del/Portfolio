@@ -4,3 +4,28 @@
 
 [functions]
   directory = "netlify/functions"
+
+# Repo-only files: answer 404 on the website (the /api/visit function is routed separately).
+[[redirects]]
+  from = "/CLAUDE.md"
+  to = "/not-found"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/design-refs/*"
+  to = "/not-found"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/tools/*"
+  to = "/not-found"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/not-found"
+  status = 404
+  force = true
