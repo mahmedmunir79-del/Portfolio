@@ -1834,7 +1834,7 @@ document.addEventListener('click', e => {
       .to(S.screen, {attr: {fill: '#DCE8F7'}, duration: .12}, S3 + 1.15);
     // camera: measure where the phone screen will be once the arm is raised
     gsap.set(S.arm, {rotation: -78, transformOrigin: ARM});
-    const bb = S.screen.getBBox(), mtx = S.screen.getCTM(), toV = (x, y) => new DOMPoint(x, y).matrixTransform(mtx);
+    const bb = S.screen.getBBox(), mtx = S.cam.getCTM().inverse().multiply(S.screen.getCTM()), // in viewBox units toV = (x, y) => new DOMPoint(x, y).matrixTransform(mtx);
     const p0 = toV(bb.x, bb.y), p1 = toV(bb.x + bb.width, bb.y + bb.height);
     gsap.set(S.arm, {rotation: 0});
     // zoom until the lit phone screen covers the whole block, then the portal rises out of it
@@ -1854,7 +1854,7 @@ document.addEventListener('click', e => {
         .set(c.cursor, {opacity: 0}, at + typing + .5);
       if (c.rupee) t.to(c.rupee, {keyframes: {scale: [1, 1.35, 1, 1.25, 1]}, duration: .5, transformOrigin: '50% 50%'}, at + .3);
     });
-    const sb = S.submit.getCTM(), sbx = sb.e, sby = sb.f, T4 = S4 + 1.9;
+    const sb = S.portal.getCTM().inverse().multiply(S.submit.getCTM()), sbx = sb.e, sby = sb.f, T4 = S4 + 1.9;
     t.fromTo(S.pointer, {x: sbx + 40, y: sby + 70, opacity: 0}, {x: sbx + 4, y: sby + 2, opacity: 1, duration: .45, ease: 'power2.out', immediateRender: false}, T4)
       .to(S.subIn, {keyframes: {scale: [1, .9, 1]}, duration: .22, transformOrigin: '50% 50%'}, T4 + .45)
       .to(S.pointer, {opacity: 0, duration: .2}, T4 + .7)
