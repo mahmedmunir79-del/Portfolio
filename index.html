@@ -199,6 +199,9 @@ section{max-width:1120px;margin:0 auto;padding:4.5rem 1.2rem 1rem;position:relat
   background:repeating-linear-gradient(135deg,rgba(245,165,36,.07) 0 12px,transparent 12px 24px),var(--paper)}
 .ph svg{width:42px;height:42px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .ph span{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+/* PRJ-05 motion piece (drawn by script; aspect ratio switches to portrait on phones) */
+.ph-flow{margin:.7rem .7rem 0;border-radius:12px;overflow:hidden;background:#0F1E28;aspect-ratio:16/10}
+.ph-flow svg{display:block;width:100%;height:100%}
 .card h3{font-family:var(--disp);font-weight:700;font-size:1.35rem;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.55rem}
 .card p{font-size:.93rem;flex:1}
 .card .foot{margin-top:1rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green-dk)}
@@ -625,9 +628,8 @@ footer::before{content:"";position:absolute;inset:0;opacity:.06;background-image
       </div>
     </article>
     <article class="card">
-      <div class="ph" role="img" aria-label="Animation placeholder — animation coming soon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/></svg>
-        <span>Animation coming soon</span>
+      <div class="ph-flow" role="img" aria-label="Animated flow: Project Schedule, Project_Tasks.xlsx, Recurrence, For each candidate, Filter Prior Sends, Digest Mode, Reminder Log">
+        <svg class="flow-anim" viewBox="0 0 520 325" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
       </div>
       <div class="pad">
         <div class="num">PRJ-05 · Power Automate</div>
@@ -1172,6 +1174,369 @@ document.addEventListener('click', e => {
       [...logos, ...metas, ...dots, flash, ...secs, ...secIns, tprof, ...pulses].forEach(el => el.removeAttribute('transform'));
       pfd.classList.remove('is-off');
     };
+  });
+})();
+
+/* ---------- PRJ-05 Project Tracker Automation: title → flow builds → system runs → delivery ---------- */
+(function(){
+  const box = document.querySelector('.ph-flow');
+  if (!box) return;
+  const svg = box.querySelector('svg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const C = {navy: '#0F1E28', ink2: '#16303F', green: '#0E9F6E', mint: '#3CCB9A', amber: '#F5A524',
+    canvas: '#F7F9F8', dot: '#C9D4CF', line: '#E1E8E5', text: '#0F1E28', red: '#E5484D', blue: '#0F6CBD'};
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  };
+  const SPARK = 'M0 -5C.8 -.8 .8 -.8 5 0C.8 .8 .8 .8 0 5C-.8 .8 -.8 .8 -5 0C-.8 -.8 -.8 -.8 0 -5Z';
+
+  // The 7 key moments of the flow (titles as in the reference diagram)
+  const CHIPS = [
+    {t: 'Project Schedule', tile: '#31752F', glyph: 'P'},
+    {t: 'Project_Tasks.xlsx', tile: '#1D6F42', glyph: 'X'},
+    {t: 'Recurrence', tile: C.blue, icon: 'clock'},
+    {t: 'For each candidate', tile: '#5B626C', icon: 'loop', dark: true},
+    {t: 'Filter Prior Sends', tile: '#7B5CD6', glyph: '{x}'},
+    {t: 'Digest Mode', tile: '#5B626C', icon: 'switch', dark: true, toggle: true},
+    {t: 'Reminder Log', tile: '#1D6F42', glyph: 'X', log: true}
+  ];
+  // Wide: one snaking path in three rows. Narrow (phone): a top-to-bottom zig-zag.
+  const LAYOUT = {
+    wide: {W: 520, H: 325, rows: true,
+      pos: [[84, 62], [262, 72], [446, 62], [398, 152], [150, 162], [144, 252], [384, 242]],
+      title: {size: 34, lines: [['Automated', 'Deadline', 'Reminders']], y: [176]},
+      mon: {x: 260, y: 122, s: .36}, av: [[78, 150], [442, 150], [110, 268]]},
+    narrow: {W: 300, H: 470, rows: false,
+      pos: [[108, 50], [192, 112], [108, 174], [192, 236], [108, 298], [192, 360], [108, 422]],
+      title: {size: 38, lines: [['Automated'], ['Deadline'], ['Reminders']], y: [196, 240, 284]},
+      mon: {x: 150, y: 160, s: .42}, av: [[50, 352], [250, 352], [150, 428]]}
+  };
+
+  let mode = null, L = null, digest = true, tl = null, started = false, visible = true;
+
+  function build(){
+    mode = box.clientWidth < 420 ? 'narrow' : 'wide';
+    L = LAYOUT[mode];
+    const {W, H} = L;
+    svg.textContent = '';
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    box.style.aspectRatio = `${W} / ${H}`;
+
+    const defs = el('defs', {});
+    const pat = el('pattern', {id: 'fl-dots', width: 14, height: 14, patternUnits: 'userSpaceOnUse'}, defs);
+    el('circle', {cx: 2, cy: 2, r: 1, fill: C.dot}, pat);
+    const gA = el('radialGradient', {id: 'fl-glowA'}, defs);
+    el('stop', {offset: 0, 'stop-color': '#FFD27A', 'stop-opacity': .95}, gA);
+    el('stop', {offset: 1, 'stop-color': C.amber, 'stop-opacity': 0}, gA);
+    const gG = el('radialGradient', {id: 'fl-glowG'}, defs);
+    el('stop', {offset: 0, 'stop-color': '#B9F7DE', 'stop-opacity': 1}, gG);
+    el('stop', {offset: 1, 'stop-color': C.green, 'stop-opacity': 0}, gG);
+
+    // Scene 4 backdrop + monitor (sits behind the flow, which shrinks onto its screen)
+    el('rect', {width: W, height: H, fill: '#EEF8F3'});
+    const M = L.mon, sw = W * M.s, sh = H * M.s, sx = M.x - sw / 2, sy = M.y - sh / 2;
+    const monitor = el('g', {opacity: 0});
+    el('rect', {x: sx - 7, y: sy - 7, width: sw + 14, height: sh + 14, rx: 8, fill: C.ink2}, monitor);
+    el('path', {d: `M${M.x - 8} ${sy + sh + 7}l-4 16h24l-4-16z M${M.x - 22} ${sy + sh + 23}h44`, fill: C.ink2, stroke: C.ink2, 'stroke-width': 3, 'stroke-linecap': 'round'}, monitor);
+    const badge = el('g', {transform: `translate(${sx + sw + 4} ${sy + sh + 4})`}, monitor);
+    const badgeIn = el('g', {}, badge);
+    el('circle', {r: 9, fill: C.amber}, badgeIn);
+    el('path', {d: 'M1 -6L-4 1h4l-1 5 5-7h-4l1-5z', fill: C.navy}, badgeIn);
+    const avatars = L.av.map(([x, y]) => {
+      const g = el('g', {transform: `translate(${x} ${y})`, opacity: 0});
+      el('circle', {cy: -8, r: 7, fill: '#8FA6B2'}, g);
+      el('path', {d: 'M-12 12a12 11 0 0 1 24 0z', fill: '#8FA6B2'}, g);
+      const check = el('g', {transform: 'translate(10 -14)', opacity: 0}, g);
+      el('circle', {r: 5.5, fill: C.green}, check);
+      el('path', {d: 'M-2.5 0l1.8 1.8 3.2-3.4', fill: 'none', stroke: '#fff', 'stroke-width': 1.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}, check);
+      return {g, check, x, y};
+    });
+
+    // The flow world: light dotted canvas, path, "+" connectors, chips, pulse
+    const world = el('g', {});
+    el('rect', {width: W, height: H, fill: C.canvas}, world);
+    el('rect', {width: W, height: H, fill: 'url(#fl-dots)'}, world);
+    const P = L.pos;
+    let d = `M${P[0][0]} ${P[0][1]}`;
+    const tmp = el('path', {}, defs), at = [0];
+    for (let i = 1; i < P.length; i++) {
+      const [x0, y0] = P[i - 1], [x1, y1] = P[i];
+      if (L.rows) {
+        if (Math.abs(y1 - y0) > 40) { const o = x0 > W / 2 ? 70 : -70; d += ` C${x0 + o} ${y0} ${x1 + o} ${y1} ${x1} ${y1}`; }
+        else { const h = (x1 - x0) / 2; d += ` C${x0 + h} ${y0} ${x1 - h} ${y1} ${x1} ${y1}`; }
+      } else { const h = (y1 - y0) / 2; d += ` C${x0} ${y0 + h} ${x1} ${y1 - h} ${x1} ${y1}`; }
+      tmp.setAttribute('d', d); at.push(tmp.getTotalLength());
+    }
+    const path = el('path', {d, fill: 'none', stroke: C.green, 'stroke-width': 2.2, 'stroke-linecap': 'round'}, world);
+    const LEN = path.getTotalLength();
+    const pt = l => path.getPointAtLength(Math.max(0, Math.min(LEN, l)));
+    const normal = l => { const a = pt(l - 1), b = pt(l + 1), dx = b.x - a.x, dy = b.y - a.y, n = Math.hypot(dx, dy) || 1; return [-dy / n, dx / n]; };
+
+    const plus = [];
+    for (let i = 1; i < P.length; i++) {
+      const p = pt((at[i - 1] + at[i]) / 2);
+      const g = el('g', {transform: `translate(${p.x} ${p.y})`}, world);
+      const inner = el('g', {}, g);
+      el('circle', {r: 5.5, fill: '#fff', stroke: C.blue, 'stroke-width': 1.2}, inner);
+      el('path', {d: 'M-2.5 0h5M0 -2.5v5', stroke: C.blue, 'stroke-width': 1.2, 'stroke-linecap': 'round'}, inner);
+      plus.push(inner);
+    }
+
+    // VBA macro: a tiny spark riding the first segment
+    const vba = el('g', {opacity: 0}, world);
+    el('rect', {x: -12, y: -6, width: 24, height: 12, rx: 3, fill: '#5C2D91'}, vba);
+    el('text', {x: 0, y: 3, 'text-anchor': 'middle', 'font-family': 'IBM Plex Sans, sans-serif', 'font-size': 7.5, 'font-weight': 700, fill: '#fff'}, vba).textContent = 'VBA';
+
+    const chipLayer = el('g', {}, world);
+    const chips = CHIPS.map((c, i) => {
+      const [cx, cy] = P[i];
+      const g = el('g', {transform: `translate(${cx} ${cy})`}, chipLayer);
+      const inner = el('g', {}, g);
+      const card = el('rect', {}, inner);
+      const bar = c.dark ? null : el('rect', {}, inner);
+      const txt = el('text', {y: 4, 'font-family': 'IBM Plex Sans, sans-serif', 'font-size': 11, 'font-weight': 600, fill: c.dark ? '#fff' : C.text}, inner);
+      txt.textContent = c.t;
+      const w = 33 + txt.getComputedTextLength() + (c.toggle ? 32 : 10), h = 30, x0 = -w / 2;
+      Object.entries({x: x0, y: -h / 2, width: w, height: h, rx: 7, fill: c.dark ? '#3F4650' : '#fff', stroke: c.dark ? '#3F4650' : C.line}).forEach(([k, v]) => card.setAttribute(k, v));
+      if (bar) Object.entries({x: x0, y: -h / 2 + 4, width: 2.5, height: h - 8, rx: 1.2, fill: c.tile}).forEach(([k, v]) => bar.setAttribute(k, v));
+      txt.setAttribute('x', x0 + 33);
+      const glow = el('rect', {x: x0 - 2.5, y: -h / 2 - 2.5, width: w + 5, height: h + 5, rx: 9, fill: 'none', stroke: C.mint, 'stroke-width': 2, opacity: 0}, inner);
+      const tile = el('g', {transform: `translate(${x0 + 16} 0)`}, inner);
+      el('rect', {x: -10, y: -10, width: 20, height: 20, rx: 4.5, fill: c.tile}, tile);
+      const o = {g, inner, glow, tile, x: cx, y: cy, w};
+      if (c.glyph) el('text', {y: c.glyph.length > 1 ? 3 : 4, 'text-anchor': 'middle', 'font-family': 'IBM Plex Sans, sans-serif', 'font-weight': 700, 'font-size': c.glyph.length > 1 ? 8 : 11, fill: '#fff'}, tile).textContent = c.glyph;
+      if (c.icon === 'clock') {
+        el('circle', {r: 6, fill: 'none', stroke: '#fff', 'stroke-width': 1.4}, tile);
+        o.hour = el('line', {x1: 0, y1: 0, x2: 0, y2: -3.4, stroke: '#fff', 'stroke-width': 1.5, 'stroke-linecap': 'round', transform: 'rotate(240)'}, tile);
+        o.min = el('line', {x1: 0, y1: 0, x2: 0, y2: -4.8, stroke: '#fff', 'stroke-width': 1.2, 'stroke-linecap': 'round'}, tile);
+      }
+      if (c.icon === 'loop') o.loop = el('path', {d: 'M-5 -1a5 5 0 0 1 9 -2.5M4.5 -6v3.5h-3.5M5 1a5 5 0 0 1 -9 2.5M-4.5 6v-3.5h3.5', fill: 'none', stroke: '#fff', 'stroke-width': 1.3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}, tile);
+      if (c.icon === 'switch') el('path', {d: 'M4 -5L-3 0L4 5M-5 0h0', fill: 'none', stroke: '#fff', 'stroke-width': 1.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}, tile);
+      if (c.toggle) { // small TRUE/FALSE switch: green knob right = TRUE, red knob left = FALSE
+        const tg = el('g', {transform: `translate(${x0 + w - 24} 0)`}, inner);
+        o.pill = el('rect', {x: 0, y: -6, width: 18, height: 12, rx: 6, fill: '#6B7280'}, tg);
+        o.knob = el('circle', {cx: 6, cy: 0, r: 4, fill: '#fff'}, tg);
+      }
+      if (c.log) { // a new row slides into the Excel tile
+        const cp = el('clipPath', {id: 'fl-tile'}, defs);
+        el('rect', {x: x0 + 6, y: -10 + cy, width: 20, height: 20, rx: 4.5, transform: `translate(${cx} 0)`}, cp);
+        const rowWrap = el('g', {'clip-path': 'url(#fl-tile)', transform: `translate(${-cx} ${-cy})`}, inner);
+        o.row = el('rect', {x: cx + x0 + 9, y: cy + 5, width: 14, height: 2.6, rx: 1.3, fill: '#B6F0CF'}, rowWrap);
+      }
+      o.tick = el('g', {transform: `translate(${x0 + 25} -9)`, opacity: 0}, inner);
+      el('circle', {r: 4.5, fill: C.mint, stroke: '#fff', 'stroke-width': 1}, o.tick);
+      el('path', {d: 'M-2 0l1.4 1.4 2.6-2.8', fill: 'none', stroke: '#fff', 'stroke-width': 1.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}, o.tick);
+      return o;
+    });
+    const label0800 = el('text', {x: chips[2].x, y: chips[2].y - 22, 'text-anchor': 'middle', 'font-family': 'IBM Plex Mono, monospace', 'font-size': 10, 'font-weight': 600, fill: C.green, opacity: 0}, world);
+    label0800.textContent = '08:00';
+
+    // pulse with a short trail, plus the three candidate dots
+    const pulseLayer = el('g', {}, world);
+    const trail = [0.35, 0.55, 0.75].map((op, k) => el('circle', {r: 3.2 - k * .6, fill: C.mint, opacity: 0}, pulseLayer));
+    const pulse = el('g', {opacity: 0}, pulseLayer);
+    el('circle', {r: 9, fill: 'url(#fl-glowG)'}, pulse);
+    el('circle', {r: 3.6, fill: '#fff', stroke: C.green, 'stroke-width': 1.5}, pulse);
+    const dots = [C.red, C.amber, C.green].map(col => el('circle', {r: 3.4, fill: col, stroke: '#fff', 'stroke-width': 1, opacity: 0}, pulseLayer));
+    const cross = el('path', {d: 'M-3 -3l6 6M3 -3l-6 6', stroke: C.red, 'stroke-width': 1.6, 'stroke-linecap': 'round', opacity: 0}, pulseLayer);
+    const sparkles = Array.from({length: 6}, () => { const s = el('path', {d: SPARK, fill: C.amber, opacity: 0}, world); return s; });
+
+    // envelopes for Scene 4 (above the flow)
+    const envs = [0, 1].map(() => {
+      const g = el('g', {opacity: 0});
+      el('rect', {x: -8, y: -5.5, width: 16, height: 11, rx: 1.5, fill: '#fff', stroke: C.green, 'stroke-width': 1.2}, g);
+      el('path', {d: 'M-8 -5.5L0 1 8 -5.5', fill: 'none', stroke: C.green, 'stroke-width': 1.2, 'stroke-linejoin': 'round'}, g);
+      return g;
+    });
+    const burst = Array.from({length: 4}, () => el('path', {d: SPARK, fill: C.amber, opacity: 0}));
+
+    // Scene 1: dark cover + title with three small reacting icons
+    const cover = el('rect', {width: W, height: H, fill: C.navy, opacity: 0});
+    const title = el('g', {opacity: 0});
+    const words = [], T = L.title;
+    T.lines.forEach((line, li) => {
+      const texts = line.map(wd => { const t = el('text', {y: T.y[li], 'font-family': 'Big Shoulders Display, sans-serif', 'font-weight': 800, 'font-size': T.size, fill: '#fff', 'letter-spacing': .5}, title); t.textContent = wd; return t; });
+      const gap = T.size * .28, ws = texts.map(t => t.getComputedTextLength());
+      let x = W / 2 - (ws.reduce((a, b) => a + b, 0) + gap * (texts.length - 1)) / 2;
+      texts.forEach((t, k) => { t.setAttribute('x', x); words.push({x: x + ws[k] / 2, y: T.y[li], w: ws[k]}); x += ws[k] + gap; });
+    });
+    const titleCY = (T.y[0] + T.y[T.y.length - 1]) / 2 - T.size * .35;
+    const iconAt = (wd, k) => el('g', {transform: `translate(${wd.x + (k === 1 ? wd.w / 2 + 6 : 0)} ${wd.y - T.size * .78 - 14})`}, title);
+    const alarm = iconAt(words[0], 0), bolt = iconAt(words[1], 1), env = iconAt(words[2], 2);
+    const alarmIn = el('g', {}, alarm);
+    el('circle', {cy: 1, r: 7, fill: 'none', stroke: C.mint, 'stroke-width': 1.6}, alarmIn);
+    el('path', {d: 'M0 1V-3M0 1l3 2M-7 -5l3 -3M7 -5l-3 -3M-4 8l-2 2M4 8l2 2', fill: 'none', stroke: C.mint, 'stroke-width': 1.6, 'stroke-linecap': 'round'}, alarmIn);
+    const arcs = el('path', {d: 'M10 -4a6 6 0 0 1 0 8M13 -7a10 10 0 0 1 0 14', fill: 'none', stroke: C.mint, 'stroke-width': 1.3, 'stroke-linecap': 'round', opacity: 0}, alarm);
+    const boltGlow = el('circle', {r: 15, fill: 'url(#fl-glowA)', opacity: 0}, bolt);
+    const boltIn = el('path', {d: 'M2 -10L-6 2h6l-2 9 8 -12h-6l2 -9z', fill: 'none', stroke: C.amber, 'stroke-width': 1.6, 'stroke-linejoin': 'round'}, bolt);
+    const envIn = el('g', {}, env);
+    el('rect', {x: -9, y: -6, width: 18, height: 12, rx: 1.5, fill: 'none', stroke: C.mint, 'stroke-width': 1.6}, envIn);
+    const flap = el('path', {d: 'M-9 -6L0 1 9 -6', fill: 'none', stroke: C.mint, 'stroke-width': 1.6, 'stroke-linejoin': 'round'}, envIn);
+    const tSparks = [[-.45, -1.3], [.48, -1.1], [.4, .55]].map(([fx, fy]) => {
+      const s = el('path', {d: SPARK, fill: C.amber, opacity: 0}, title);
+      s.setAttribute('transform', `translate(${W / 2 + fx * W * .8} ${titleCY + fy * T.size})`);
+      return s;
+    });
+
+    return {world, path, LEN, at, pt, normal, plus, vba, chips, label0800, trail, pulse, dots, cross, sparkles,
+      monitor, badgeIn, avatars, envs, burst, cover, title, titleCY, alarmIn, arcs, boltGlow, boltIn, envIn, flap, tSparks, sx, sy, sw, sh};
+  }
+
+  // Reduced motion: the finished flow (Scene 2), static
+  function showStatic(){ build(); }
+
+  function sequence(){
+    const S = build(), {W, H} = L;
+    const t = gsap.timeline({paused: true, onComplete: () => { digest = !digest; start(); }});
+    const sp = (s, x, y, at, size = 1) => t.fromTo(s, {x, y, scale: 0, rotation: 0, opacity: 0, transformOrigin: '50% 50%'},
+      {scale: size, rotation: 90, opacity: 1, duration: .25, ease: 'power2.out', immediateRender: false}, at)
+      .to(s, {scale: 0, opacity: 0, duration: .25, ease: 'power2.in'}, at + .25);
+    const place = (els, l, offs, m = 1) => {
+      const p = S.pt(l), [nx, ny] = S.normal(l);
+      els.forEach((e, k) => gsap.set(e, {x: p.x + nx * offs[k] * m, y: p.y + ny * offs[k] * m}));
+    };
+    const travel = (els, from, to, dur, at0, offs, merge) => {
+      const pr = {l: from};
+      t.fromTo(pr, {l: from}, {l: to, duration: dur, ease: 'none', immediateRender: false,
+        onUpdate: () => place(els, pr.l, offs, merge ? 1 - (pr.l - from) / (to - from) : 1)}, at0);
+    };
+    const pulseTo = (from, to, dur, at0) => {
+      const pr = {l: from};
+      t.fromTo(pr, {l: from}, {l: to, duration: dur, ease: 'power1.inOut', immediateRender: false, onUpdate: () => {
+        place([S.pulse], pr.l, [0]);
+        S.trail.forEach((tr, k) => place([tr], pr.l - (k + 1) * 6, [0]));
+      }}, at0);
+    };
+    const light = (c, at0) => t.fromTo(c.glow, {opacity: 0}, {opacity: 1, duration: .15, immediateRender: false}, at0)
+      .to(c.glow, {opacity: 0, duration: .45}, at0 + .2)
+      .fromTo(c.tick, {scale: 0, opacity: 0, transformOrigin: '50% 50%'}, {scale: 1, opacity: 1, duration: .25, ease: 'back.out(3)', immediateRender: false}, at0 + .05);
+
+    // initial state (everything hidden except the dark cover)
+    gsap.set(S.cover, {opacity: 1});
+    gsap.set(S.title, {opacity: 0, scale: .35, filter: 'blur(6px)', svgOrigin: `${W / 2} ${S.titleCY}`});
+    gsap.set([S.alarmIn, S.boltIn, S.envIn], {scale: 0, opacity: 0, transformOrigin: '50% 50%'});
+    gsap.set(S.path, {strokeDasharray: `${S.LEN} ${S.LEN + 10}`, strokeDashoffset: S.LEN});
+    gsap.set(S.chips.map(c => c.inner), {scale: .85, opacity: 0, transformOrigin: '50% 50%'});
+    gsap.set(S.plus, {scale: 0, transformOrigin: '50% 50%'});
+    gsap.set(S.chips[6].row, {x: -18});
+
+    // Scene 1 — title zooms in, icons snap onto the words, then it all flies past
+    t.to(S.title, {opacity: 1, scale: 1, filter: 'blur(0px)', duration: .8, ease: 'expo.out'}, .05);
+    [S.alarmIn, S.boltIn, S.envIn].forEach((ic, k) => t.fromTo(ic, {scale: 0, opacity: 0, y: -8}, {scale: 1, opacity: 1, y: 0, duration: .25, ease: 'back.out(3)', immediateRender: false}, .45 + k * .12));
+    t.to(S.alarmIn, {keyframes: {rotation: [0, -14, 14, -10, 10, 0]}, duration: .4, transformOrigin: '50% 50%'}, .72)
+      .fromTo(S.arcs, {opacity: 0}, {opacity: 1, duration: .1, yoyo: true, repeat: 3, immediateRender: false}, .72)
+      .fromTo(S.boltGlow, {opacity: 0}, {opacity: .9, duration: .15, yoyo: true, repeat: 1, immediateRender: false}, .86)
+      .to(S.flap, {keyframes: {scaleY: [1, -1, 1]}, duration: .45, transformOrigin: '50% 0%'}, .98);
+    S.tSparks.forEach((s, k) => t.fromTo(s, {scale: 0, opacity: 0, transformOrigin: '50% 50%'}, {scale: 1, opacity: 1, rotation: 90, duration: .2, yoyo: true, repeat: 1, immediateRender: false}, .7 + k * .18));
+    t.to(S.title, {scale: 3.2, opacity: 0, duration: .45, ease: 'power2.in'}, 1.4)
+      .to(S.cover, {opacity: 0, duration: .4, ease: 'power1.inOut'}, 1.48);
+
+    // Scene 2 — the path draws itself; each chip pops in as the line reaches it
+    const S2 = 1.8, DRAW = 1.9;
+    const reach = f => f < .5 ? Math.cbrt(f / 4) : 1 - Math.cbrt(2 * (1 - f)) / 2; // inverse of power2.inOut
+    t.to(S.path, {strokeDashoffset: 0, duration: DRAW, ease: 'power2.inOut'}, S2);
+    S.chips.forEach((c, i) => t.to(c.inner, {scale: 1, opacity: 1, duration: .3, ease: 'back.out(2)'}, S2 + reach(S.at[i] / S.LEN) * DRAW - .05));
+    S.plus.forEach((p, i) => t.to(p, {scale: 1, duration: .2, ease: 'back.out(3)'}, S2 + reach(((S.at[i] + S.at[i + 1]) / 2) / S.LEN) * DRAW));
+    const vbaEnd = S2 + reach(S.at[1] / S.LEN) * DRAW;
+    t.fromTo(S.vba, {opacity: 0}, {opacity: 1, duration: .12, immediateRender: false}, S2 + .05);
+    travel([S.vba], 0, S.at[1], vbaEnd - S2 - .05, S2 + .05, [-12]);
+    t.to(S.vba, {opacity: 0, duration: .15}, vbaEnd);
+
+    // Scene 3 — the system runs: one pulse travels the path and each chip reacts
+    const S3 = S2 + 2.4, SEG = .32, ch = S.chips;
+    t.fromTo([S.pulse, ...S.trail], {opacity: 0}, {opacity: (i) => i ? [.35, .25, .15][i - 1] : 1, duration: .15, immediateRender: false}, S3);
+    place([S.pulse, ...S.trail], 0, [0, 0, 0, 0]);
+    light(ch[0], S3);
+    pulseTo(S.at[0], S.at[1], SEG, S3 + .1); light(ch[1], S3 + .1 + SEG);
+    let k = S3 + .1 + 2 * SEG;
+    pulseTo(S.at[1], S.at[2], SEG, S3 + .1 + SEG); light(ch[2], k);
+    // Recurrence: hands sweep round to 08:00, a small ring, then the pulse launches with a burst
+    t.fromTo(ch[2].min, {rotation: 0}, {rotation: 720, duration: .4, ease: 'power2.inOut', transformOrigin: '50% 100%', immediateRender: false}, k)
+      .fromTo(ch[2].hour, {rotation: 120}, {rotation: 240, duration: .4, ease: 'power2.inOut', transformOrigin: '50% 100%', immediateRender: false}, k)
+      .to(ch[2].tile, {keyframes: {x: [0, -1.2, 1.2, -1, 0]}, duration: .2}, k + .4)
+      .fromTo(S.label0800, {opacity: 0, y: 4}, {opacity: 1, y: 0, duration: .2, immediateRender: false}, k + .35);
+    S.sparkles.slice(0, 3).forEach((s, j) => sp(s, ch[2].x + [-14, 0, 14][j], ch[2].y + [-12, -20, -12][j], k + .45 + j * .04, .8));
+    k += .5;
+    pulseTo(S.at[2], S.at[3], SEG, k); k += SEG; light(ch[3], k);
+    // For each candidate: loop icon spins once, the pulse splits into three (overdue, due today, due soon)
+    t.to(ch[3].loop, {rotation: 360, duration: .35, ease: 'power2.inOut', transformOrigin: '50% 50%'}, k)
+      .to([S.pulse, ...S.trail], {opacity: 0, duration: .12}, k + .05);
+    place(S.dots, S.at[3], [-6, 0, 6]);
+    t.fromTo(S.dots, {opacity: 0}, {opacity: 1, duration: .12, immediateRender: false}, k + .05);
+    travel(S.dots, S.at[3], S.at[4], SEG + .1, k + .15, [-6, 0, 6]); k += .15 + SEG + .1; light(ch[4], k);
+    // Filter Prior Sends: one candidate was already reminded — it is filtered out with a tiny ✕
+    const fp = S.pt(S.at[4]);
+    gsap.set(S.cross, {x: fp.x, y: fp.y});
+    t.fromTo(S.cross, {opacity: 0, scale: .5, transformOrigin: '50% 50%'}, {opacity: 1, scale: 1, duration: .15, immediateRender: false}, k + .05)
+      .to(S.dots[1], {opacity: 0, scale: 0, duration: .25, transformOrigin: '50% 50%'}, k + .05)
+      .to(S.cross, {opacity: 0, duration: .2}, k + .35);
+    travel([S.dots[0], S.dots[2]], S.at[4], S.at[5], SEG, k + .2, [-6, 6]); k += .2 + SEG; light(ch[5], k);
+    // Digest Mode: the switch flips (TRUE: one daily digest, FALSE: one email per task)
+    t.to(ch[5].knob, {attr: {cx: digest ? 12 : 6}, duration: .2, ease: 'power2.out'}, k)
+      .to(ch[5].pill, {attr: {fill: digest ? '#2E9E5B' : C.red}, duration: .2}, k);
+    if (digest) t.to(S.dots, {attr: {fill: C.green}, duration: .2}, k + .15);
+    travel([S.dots[0], S.dots[2]], S.at[5], S.at[6], SEG + .05, k + .15, [-6, 6], digest); k += .2 + SEG; light(ch[6], k);
+    // Reminder Log: a new row slides into the Excel tile
+    t.to(ch[6].row, {x: 0, duration: .3, ease: 'power2.out'}, k)
+      .to(S.dots, {opacity: 0, duration: .2}, k + .1);
+    S.sparkles.slice(3).forEach((s, j) => sp(s, ch[6].x + ch[6].w / 2 - 6 + j * 6, ch[6].y - 18 + j * 4, k + .1 + j * .05, .7));
+
+    // Scene 4 — the flow shrinks onto a monitor; emails fly out to the people who need them
+    const S4 = k + .55, M = L.mon;
+    t.to(S.world, {x: S.sx, y: S.sy, scale: M.s, duration: .85, ease: 'power3.inOut', transformOrigin: '0 0'}, S4)
+      .to(S.monitor, {opacity: 1, duration: .4}, S4 + .25)
+      .to(S.avatars.map(a => a.g), {opacity: 1, duration: .3, stagger: .1}, S4 + .65)
+      .to(S.badgeIn, {scale: 1.25, duration: .3, yoyo: true, repeat: 5, ease: 'sine.inOut', transformOrigin: '50% 50%'}, S4 + .9);
+    const targets = digest ? [0] : [0, 1];
+    targets.forEach((ai, j) => {
+      const a = S.avatars[ai], env = S.envs[j], x0 = M.x, y0 = S.sy - 2, x1 = a.x, y1 = a.y - 26;
+      const cx = (x0 + x1) / 2, cy = Math.min(y0, y1) - 40, pr = {t: 0}, at0 = S4 + 1.05 + j * .3;
+      t.fromTo(env, {opacity: 0}, {opacity: 1, duration: .1, immediateRender: false}, at0)
+        .fromTo(pr, {t: 0}, {t: 1, duration: .6, ease: 'power1.inOut', immediateRender: false, onUpdate: () => {
+          const u = pr.t, v = 1 - u;
+          gsap.set(env, {x: v * v * x0 + 2 * v * u * cx + u * u * x1, y: v * v * y0 + 2 * v * u * cy + u * u * y1, rotation: -18 + 18 * u});
+        }}, at0)
+        .to(env, {opacity: 0, scale: .4, duration: .15, transformOrigin: '50% 50%'}, at0 + .6)
+        .fromTo(a.check, {opacity: 0, scale: 0, transformOrigin: '50% 50%'}, {opacity: 1, scale: 1, duration: .25, ease: 'back.out(3)', immediateRender: false}, at0 + .6);
+      S.burst.slice(j * 2, j * 2 + 2).forEach((s, b) => sp(s, x1 + (b ? 14 : -14), y1 - 4, at0 + .62 + b * .05, .7));
+    });
+
+    // Loop: hold the delivered state, fade back to the dark cover, restart (with the other branch)
+    const END = S4 + 1.05 + targets.length * .3 + .9;
+    t.to(S.cover, {opacity: 1, duration: .6, ease: 'power1.inOut'}, END + 1.2);
+    return t;
+  }
+
+  function start(){
+    if (tl) tl.kill();
+    tl = sequence();
+    started = true;
+    if (visible) tl.play();
+  }
+
+  if (!window.gsap || !window.ScrollTrigger) { showStatic(); return; }
+  gsap.matchMedia().add({motion: '(prefers-reduced-motion: no-preference)', reduce: '(prefers-reduced-motion: reduce)'}, ctx => {
+    if (ctx.conditions.reduce) { document.fonts.ready.then(showStatic); return; }
+    let cancelled = false;
+    document.fonts.ready.then(() => {
+      if (cancelled) return;
+      tl = sequence(); // primed on the dark cover until it scrolls into view
+      ScrollTrigger.create({trigger: box, start: '40% bottom', once: true, onEnter: () => { if (!started) start(); }});
+      ScrollTrigger.create({trigger: box, start: 'top bottom', end: 'bottom top', onToggle: self => {
+        visible = self.isActive;
+        if (started) visible ? tl.resume() : tl.pause();
+      }});
+    });
+    let rt;
+    const onResize = () => { clearTimeout(rt); rt = setTimeout(() => {
+      const m = box.clientWidth < 420 ? 'narrow' : 'wide';
+      if (m !== mode) { if (started) start(); else { if (tl) tl.kill(); tl = sequence(); } }
+    }, 150); };
+    addEventListener('resize', onResize);
+    return () => { cancelled = true; removeEventListener('resize', onResize); if (tl) tl.kill(); tl = null; started = false; showStatic(); };
   });
 })();
 </script>
