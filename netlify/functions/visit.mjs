@@ -48,13 +48,14 @@ const flag = (code) => (/^[A-Z]{2}$/.test(code || "") ? String.fromCodePoint(...
 
 async function forward(payload) {
   const url = Netlify.env.get("VISIT_WEBHOOK_URL"), secret = Netlify.env.get("VISIT_WEBHOOK_SECRET");
-  if (!url || !secret) return;
+  if (!url || !secret) { console.log("visit: env missing", !!url, !!secret); return; }
   try {
-    await fetch(url, {
+    const r = await fetch(url, {
       method: "POST", headers: { "content-type": "application/json" }, redirect: "manual",
       body: JSON.stringify({ ...payload, secret }), signal: AbortSignal.timeout(3000)
     });
-  } catch { /* silent */ }
+    console.log("visit: forwarded", r.status);
+  } catch (e) { console.log("visit: forward failed", e && e.name); }
 }
 
 export default async (req, context) => {
@@ -87,7 +88,7 @@ export default async (req, context) => {
       page: clean(d.page, 100, /[^A-Za-z0-9/_.\-]/g) || "/",
     };
     context.waitUntil(forward(payload)); // answer the browser immediately; email is sent in the background
-  } catch { /* silent */ }
+  } catch (e) { console.log("visit: handler error", e && e.name); }
   return done;
 };
 
