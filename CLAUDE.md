@@ -36,21 +36,26 @@
 ## CURRENT TASK: Step 3 — motion design for "Project Tracker Automation" (PRJ-05)
 Keep working on `redesign-step1`. Replace the "Animation coming soon" placeholder (`.ph` box in the PRJ-05 card) with a looping, code-only motion piece. Change nothing else on the site. **The Power Apps card (CI Idea Portal) keeps its placeholder for now.**
 
-**Reference:** `design-refs/automation-flow-ref.png` is the real flow diagram I made for this automation. Open it and study it. Use **only the middle diagram** (the four stages and their cards). **Ignore its header, the four stat boxes and the footer.** Some characters in the image are garbled by encoding: `Â·` means `·` and `â†'` means `→`.
+**Reference:** `design-refs/automation-flow-ref.png` is the real flow diagram I made for this automation. Open it and study it. Use **only the middle diagram** as the source of the flow's logic. **Ignore its header, the four stat boxes and the footer.** Some characters in the image are garbled by encoding: `Â·` means `·` and `â†'` means `→`.
 
 **Same tech and rules as the fractionation piece:** inline SVG + one GSAP timeline + ScrollTrigger (already loaded from cdnjs). No video, no WebGL, no Lottie, no new libraries. Check GSAP docs with Context7. Animate transform, opacity and SVG stroke only.
 
 ### The story
 *Every morning at 08:00, a system I built reads the project schedule, decides who needs a reminder, emails them and logs it, with nobody touching it.* The viewer should come away thinking: "he designed an automated system end to end."
 
-### Exact text to use (from my diagram; don't add, reword or invent labels)
-- **Title (Scene 1):** "Automated Deadline Reminders"
-- **Stage labels:** 1 PLAN & EXPORT · 2 TRIGGER & READ · 3 DECIDE & DE-DUPLICATE · 4 NOTIFY & LOG
-- **Stage 1:** Project Schedule — MS Project · 129 tasks | ExportTasksToExcel — Macro · one-click sync | Project_Tasks.xlsx — OneDrive · tasks + settings
-- **Stage 2:** Recurrence — Daily · 08:00 | List Settings — Window, recipients | List Tasks — Live schedule | List Log — Already reminded
-- **Stage 3:** Filter Eligible — Open · active · real dates | For each candidate — Overdue · Due today · Due soon (dark card) | Filter Prior Sends — No duplicate reminders
-- **Stage 4:** Digest Mode — Switch · from settings (dark card) → Send Digest [TRUE] — One daily summary email / Send Each Task [FALSE] — Email to each task owner → Add a row · Reminder Log — Every reminder logged · failures retried
-- Icons as in the reference: simple coloured letter tiles (P green, VBA purple, X green for Excel, clock blue, {x} violet, loop icon, envelope blue, switch icon). **Don't use real Microsoft logo artwork**; the letter tiles are enough.
+### Simplify the diagram (creative freedom)
+Don't reproduce all 14 cards. **Distil the flow to its 7 key moments**, shown as compact **chips** (icon tile + title only, no subtitles, no stage badges) strung along **one flowing path** that gently curves or snakes, rather than the rigid four-row grid. Aim for aesthetics over completeness: the viewer should grasp the idea in a glance.
+
+The 7 chips, in order (titles exactly as in my diagram):
+1. **Project Schedule** (P tile, green): the source.
+2. **Project_Tasks.xlsx** (X tile, Excel green): the export lands here. The VBA macro is shown as a tiny "VBA" spark riding the arrow between 1 and 2, not as its own chip.
+3. **Recurrence** (clock tile, blue): the daily trigger.
+4. **For each candidate** (loop tile, dark chip): where it splits into three.
+5. **Filter Prior Sends** ({x} tile, violet): de-duplication.
+6. **Digest Mode** (switch tile, dark chip): one chip with a small TRUE/FALSE toggle on it, instead of two branch cards.
+7. **Reminder Log** (X tile, Excel green): the end of the line.
+
+Icons: simple coloured letter/glyph tiles as in the reference. **Don't use real Microsoft logo artwork.** No other text inside the animation besides these titles, the Scene 1 title, and "08:00".
 
 ### Scene 1: Title zoom (~1.8 s)
 - The block starts dark navy. "Automated Deadline Reminders" starts small and slightly blurred in the distance and **zooms toward the viewer** to full size (`expo.out`).
@@ -61,19 +66,17 @@ Keep working on `redesign-step1`. Replace the "Animation coming soon" placeholde
 - Two or three small 4-point sparkles twinkle around the title.
 - Transition: the whole title keeps zooming past the viewer (scale up + fade), and the background flips to the light dotted canvas of Scene 2.
 
-### Scene 2: The flow builds (~3 s)
-Recreate the reference diagram's layout: four rows, white cards with a coloured left edge and soft shadow, a dotted-grid background, and the small "+" connector circles on the arrows.
-- **Row by row, left to right:** the stage badge (number circle + label) pops first, then each card **pops in** (scale 0.85→1, slight `back.out`, about 0.12 s apart). Between cards, the **arrow draws itself** and its "+" circle pops when the line passes it.
-- The connector that drops from the end of one row to the start of the next **draws along its full elbow path**, so the eye follows the flow down.
-- Rhythm: 3 cards → 4 cards → 3 cards → the stage 4 branch. Row 4: Digest Mode appears, the line **splits** into the TRUE and FALSE branches, then both **merge** into Reminder Log.
-- The whole build takes about 3 seconds: quick but readable.
+### Scene 2: The flow builds (~2.5 s)
+- Light canvas with a faint dotted grid. The path **draws itself** from left to right (stroke drawing, `power2.inOut`), and each chip **pops in** (scale 0.85→1, slight `back.out`) the moment the line reaches it.
+- Small "+" connector circles from the reference sit on the path between chips and pop as the line passes, a nod to the Power Automate look.
+- The VBA spark zips along the first segment as it draws.
 
 ### Scene 3: The system runs (~3 s)
-Now show it working. A single **glowing pulse** (a bright emerald dot with a short sparkle trail) travels the whole path from Project Schedule to Reminder Log. As it reaches each card, that card **lights up briefly** (border glow + a small tick on the icon).
+Now show it working. A single **glowing pulse** (a bright emerald dot with a short sparkle trail) travels the whole path from Project Schedule to Reminder Log. As it reaches each chip, that chip **lights up briefly** (border glow + a small tick on the icon).
 - **Recurrence:** the clock icon's hands sweep round and stop at 08:00, with a small ring. This is the trigger, so the pulse "launches" from here with a little burst.
 - **For each candidate:** its loop icon spins once, and the pulse **splits into three small dots** in red, amber and green (Overdue, Due today, Due soon).
 - **Filter Prior Sends:** one of the three dots is **filtered out** (it fades with a tiny ✕). This visibly shows the de-duplication.
-- **Digest Mode:** the switch icon **flips**, and the pulse takes **one branch**. **Alternate each loop:** TRUE (Send Digest) on one loop, FALSE (Send Each Task) on the next, so both paths get shown over time. The unused branch dims.
+- **Digest Mode:** the TRUE/FALSE toggle on the chip **flips**. **Alternate each loop:** TRUE on one loop (the dots merge into one, the daily digest) and FALSE on the next (the dots stay separate, one email each), so both behaviours get shown over time.
 - **Reminder Log:** a "+1" row slides into the Excel tile, with a soft sparkle.
 
 ### Scene 4: Delivery (~3 s)
@@ -89,9 +92,9 @@ Now show it working. A single **glowing pulse** (a bright emerald dot with a sho
 - Effects budget, to stay light and calm: at most about 12 sparkles on screen at once, one pulse trail, and no continuous background motion beyond a very faint dotted grid.
 
 ### Size and layout
-- 13 cards won't be readable in a small card thumbnail. **Make the PRJ-05 card span the full width of the projects grid** on desktop, with the animation box at roughly 16:9 above the existing text. Tell me if this upsets the grid, and suggest an alternative.
-- **Phones:** turn the flow into a **single vertical column** (stage badge, then that stage's cards stacked, arrows pointing down), using the same order and timing. Scene 1 and Scene 4 work as they are, just scaled. Text must stay readable; shorten nothing.
-- Colours: keep the reference's product colours for the icon tiles so they stay recognisable; everything else (pulse, glows, sparkles, title) uses the site's emerald/amber palette.
+- **Keep the PRJ-05 card its normal size** if the chips are readable there. Only widen it (span two columns) if they aren't, and tell me if you did.
+- **Phones:** the path runs top to bottom as a gentle zig-zag, with the same chips and order. Titles must stay readable.
+- Colours: product colours for the icon tiles; everything else (path, pulse, glows, sparkles, title) uses the site's emerald/amber palette.
 - The card's existing number, heading, description and footer text stay exactly as they are.
 
 ### When Step 3 is done
