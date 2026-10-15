@@ -1840,7 +1840,7 @@ document.addEventListener('click', e => {
     // zoom until the lit phone screen covers the whole block, then the portal rises out of it
     const pc = {x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2}, k = Math.max(W / Math.abs(p1.x - p0.x), H / Math.abs(p1.y - p0.y)) * 1.08;
     const Z = S3 + 1.3;
-    t.to(S.cam, {x: W / 2 - k * pc.x, y: H / 2 - k * pc.y, scale: k, duration: .8, ease: 'power3.inOut', transformOrigin: '0 0'}, Z)
+    t.to(S.cam, {x: W / 2 - k * pc.x, y: H / 2 - k * pc.y, scale: k, duration: .8, ease: 'power3.inOut', svgOrigin: '0 0'}, Z)
       .fromTo(S.portal, {opacity: 0, scale: .9, transformOrigin: '50% 50%'}, {opacity: 1, scale: 1, duration: .35, ease: 'power2.out', immediateRender: false}, Z + .5);
 
     // Scene 4 — the portal: four field cards pop in and type themselves, then Submit
